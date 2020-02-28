@@ -1,0 +1,37 @@
+{
+  "name": "quick-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "eslint app && node app" 
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Galaxy97/quick-test.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Galaxy97/quick-test/issues"
+  },
+  "homepage": "https://github.com/Galaxy97/quick-test#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-prettier": "^3.1.2",
+    "express": "^4.17.1",
+    "husky": "^4.2.3",
+    "knex": "^0.20.10",
+    "pg": "^7.18.2",
+    "prettier": "^1.19.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "echo Check your code && eslint app "
+    }
+  }
+}

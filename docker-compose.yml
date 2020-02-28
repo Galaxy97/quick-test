@@ -1,0 +1,12 @@
+version: '3'
+services:
+  pg:
+    container_name: pg
+    image: postgres:11.5-alpine
+    volumes:
+      - temp:/var/lib/postgresql/data
+    ports:
+      - 5420:5432
+volumes:
+  temp:
+    driver: local

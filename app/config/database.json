@@ -1,0 +1,6 @@
+{
+  "HOST": "localhost",
+  "PORT": 5420,
+  "NAME": "quick_test",
+  "USER": "postgres"
+}
