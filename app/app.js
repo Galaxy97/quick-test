@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const routers = require('./routers');
 
 // db connection
 require('./db');
@@ -15,10 +16,16 @@ app.get('/', (req, res) => {
   res.send('ok');
 });
 
+app.use('/api', routers);
+
 app.use((req, res, next) => {
-  const err = new Error(`Not Found ${req.path}`);
-  err.status = 404;
-  next(err);
+  if (req.url === '/favicon.ico') {
+    res.sendStatus(404);
+  } else {
+    const err = new Error(`Not Found ${req.path}`);
+    err.status = 404;
+    next(err);
+  }
 });
 
 // eslint-disable-next-line consistent-return
