@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const createError = require('http-errors');
+
 const routers = require('./routers');
 
 // db connection
@@ -11,34 +13,21 @@ app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({extended: true}));
 
-// test
-app.get('/', (req, res) => {
-  res.send('ok');
-});
-
 app.use('/api', routers);
 
 app.use((req, res, next) => {
-  if (req.url === '/favicon.ico') {
-    res.sendStatus(404);
-  } else {
-    const err = new Error(`Not Found ${req.path}`);
-    err.status = 404;
-    next(err);
-  }
+  next(createError(404, `Page Not Found ${req.path}`));
 });
 
-// eslint-disable-next-line consistent-return
+// eslint-disable-next-line no-unused-vars
 app.use((error, req, res, next) => {
-  if (error.errors) {
-    return res.status(400).json({
-      error: {
-        name: error.name,
-        errors: error.errors,
-      },
-    });
-  }
-  next(error);
+  res.status(error.status || 500);
+  res.json({
+    status: error.status,
+    message: error.message,
+    // when development
+    stack: error.stack,
+  });
 });
 
 console.log(`
