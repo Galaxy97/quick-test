@@ -1,8 +1,13 @@
 const createError = require('http-errors');
 const services = require('../../services');
 
-module.exports.getAll = async (req, res) => {
-  res.send('ok');
+module.exports.getAll = async (req, res, next) => {
+  try {
+    const courses = await services.documents.courses.getAll(req.user);
+    res.send({courses});
+  } catch (error) {
+    next(createError(500, error.message));
+  }
 };
 
 module.exports.new = async (req, res, next) => {
