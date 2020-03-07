@@ -4,12 +4,11 @@ const validSchemes = require('./validators');
 const {lecturer} = require('../../controllers');
 const checkHash = require('../../utils/checkHash');
 
-router.get('/', lecturer.hello);
 router.post(
-  '/',
-  validator(validSchemes.registration),
-  checkHash,
-  lecturer.create,
-); // registration
+  '/', // domain.com/api/lecturer
+  validator(validSchemes.authorization), // valid type input data
+  checkHash, // chek correct data
+  lecturer.authorization, // controller
+);
 
 module.exports = router;
