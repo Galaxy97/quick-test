@@ -27,6 +27,6 @@ module.exports = (req, res, next) => {
     .update(checkString)
     .digest('hex');
 
-  if (hmac !== checkHash) throw createError('Invalid data signature');
+  if (hmac !== checkHash) next(createError('Invalid data signature'));
   next();
 };

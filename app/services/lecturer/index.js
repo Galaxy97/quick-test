@@ -1,3 +1,5 @@
+const uuidValidate = require('uuid-validate');
+
 const dataBase = require('../../db');
 
 // eslint-disable-next-line consistent-return
@@ -32,4 +34,12 @@ module.exports.authorization = async body => {
     console.log(error);
     throw error;
   }
+};
+
+module.exports.checkToken = async token => {
+  if (uuidValidate(token)) {
+    const result = await dataBase.from('Lecturers').where({token});
+    return result;
+  }
+  return false;
 };
