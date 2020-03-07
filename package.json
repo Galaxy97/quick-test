@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "eslint app && node app" 
+    "start": "eslint app && node app"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Galaxy97/quick-test#readme",
   "dependencies": {
+    "ajv": "^6.12.0",
     "body-parser": "^1.19.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
@@ -24,10 +25,14 @@
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-prettier": "^3.1.2",
     "express": "^4.17.1",
+    "helmet": "^3.21.3",
+    "http-errors": "^1.7.3",
     "husky": "^4.2.3",
     "knex": "^0.20.10",
+    "morgan": "^1.9.1",
     "pg": "^7.18.2",
-    "prettier": "^1.19.1"
+    "prettier": "^1.19.1",
+    "uuid-validate": "0.0.3"
   },
   "husky": {
     "hooks": {
