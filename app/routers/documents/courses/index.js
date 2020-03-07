@@ -8,9 +8,13 @@ router.get('/', documents.courses.getAll); // get all courses this user
 
 router.post('/', validator(validSchemes.createCourse), documents.courses.new); // create new couses
 
-// router.put('/courses/:id', checkUser, documents.courses.editById); // edit couses by id
+router.put(
+  '/:id',
+  validator(validSchemes.editCourse),
+  documents.courses.editById,
+); // edit couses by id
 
 // router.delete('/courses', checkUser, documents.courses.deleteAll); // delete all couses
-// router.delete('/courses/:id', checkUser, documents.courses.deleteById); // delete courses by id
+router.delete('/:id', documents.courses.deleteById); // delete courses by id
 
 module.exports = router;
