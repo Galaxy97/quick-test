@@ -1,10 +1,10 @@
 exports.up = async knex => {
-  return knex.schema.createTable('Courses', table => {
+  return knex.schema.createTable('Subjects', table => {
     table.increments('id');
     table.string('title').notNullable();
     table
-      .integer('lecturer_id')
-      .references('Lecturers.id')
+      .integer('courses_id')
+      .references('Courses.id')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
     table.timestamp('created_at').defaultTo(knex.fn.now());

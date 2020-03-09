@@ -23,7 +23,7 @@ module.exports.authorization = async body => {
         })
         .returning('token');
       // eslint-disable-next-line prefer-destructuring
-      result.token = res[0].token;
+      [result.token] = res;
     } else {
       // user has looked
       // eslint-disable-next-line prefer-destructuring

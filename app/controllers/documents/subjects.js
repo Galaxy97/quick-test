@@ -3,8 +3,8 @@ const services = require('../../services');
 
 module.exports.getAll = async (req, res, next) => {
   try {
-    const courses = await services.documents.courses.getAll(req.user);
-    res.send({courses});
+    const subject = await services.documents.subjects.getAll(req.coursesID);
+    res.send({subject});
   } catch (error) {
     next(createError(500, error.message));
   }
@@ -12,8 +12,11 @@ module.exports.getAll = async (req, res, next) => {
 
 module.exports.create = async (req, res, next) => {
   try {
-    const course = await services.documents.courses.create(req.user, req.body);
-    res.json({id: course});
+    const subject = await services.documents.subjects.create(
+      req.coursesID,
+      req.body,
+    );
+    res.json({id: subject});
   } catch (error) {
     next(createError(500, error.message));
   }
@@ -21,12 +24,12 @@ module.exports.create = async (req, res, next) => {
 
 module.exports.editById = async (req, res, next) => {
   try {
-    const course = await services.documents.courses.editById(
-      req.user,
+    const subject = await services.documents.subjects.editById(
+      req.coursesID,
       Number(req.params.id),
       req.body,
     );
-    if (course) res.json({id: course});
+    if (subject) res.json({id: subject});
     else next(createError(400, 'Bad request'));
   } catch (error) {
     next(createError(500, error.message));
@@ -35,8 +38,8 @@ module.exports.editById = async (req, res, next) => {
 
 module.exports.deleteById = async (req, res, next) => {
   try {
-    const result = await services.documents.courses.deleteById(
-      req.user,
+    const result = await services.documents.subjects.deleteById(
+      req.coursesID,
       Number(req.params.id),
     );
     if (result) res.json({message: 'successful delete'});
