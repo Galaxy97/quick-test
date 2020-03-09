@@ -10,7 +10,7 @@ router.get('/', documents.subjects.getAll); // get all courses this user
 // }); // get all courses this user
 
 router.post(
-  '/:id',
+  '/',
   validator(validSchemes.createSubjects),
   documents.subjects.create,
 ); // create new couses

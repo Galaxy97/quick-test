@@ -3,7 +3,7 @@ const services = require('../../services');
 
 module.exports.getAll = async (req, res, next) => {
   try {
-    const courses = await services.documents.courses.getAll(req);
+    const courses = await services.documents.courses.getAll(req.user);
     res.send({courses});
   } catch (error) {
     next(createError(500, error.message));
