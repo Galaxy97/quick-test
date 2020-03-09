@@ -1,5 +1,3 @@
-const createError = require('http-errors');
-
 const dataBase = require('../../../db');
 
 module.exports.getAll = async user => {
@@ -19,23 +17,35 @@ module.exports.new = async (user, body) => {
     })
     .returning('id');
   if (course.length > 0) return course[0];
-  throw createError(400, 'Bad request');
+  return false;
 };
 
-module.exports.editById = async (user, id, body) => {
+module.exports.editById = (user, id, body) => {
   // edit cours by id
-  const course = await dataBase('Courses')
+  dataBase('Courses')
     .where({id, lecturer_id: user.id})
     .update({title: body.title})
-    .returning('id');
-  if (course.length > 0) return course[0];
-  throw createError(400, 'Bad request');
+    .returning('id')
+    .then(course => {
+      if (course.length > 0) return course[0];
+      return false;
+    })
+    .catch(e => {
+      console.log(e);
+      return false;
+    });
 };
 
-module.exports.deleteById = async (user, id) => {
+module.exports.deleteById = (user, id) => {
   // edit cours by id
-  await dataBase('Courses')
+  dataBase('Courses')
     .where({id, lecturer_id: user.id})
-    .del();
-  return true;
+    .del()
+    .then(() => {
+      return true;
+    })
+    .catch(e => {
+      console.log(e);
+      return false;
+    });
 };

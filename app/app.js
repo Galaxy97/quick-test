@@ -30,7 +30,7 @@ app.use((error, req, res, next) => {
   res.json({
     status: error.status,
     message: error.message,
-    // when development
+    // when node_env === delelopment
     stack: error.stack,
   });
 });

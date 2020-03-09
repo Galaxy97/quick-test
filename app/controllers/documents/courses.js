@@ -26,7 +26,8 @@ module.exports.editById = async (req, res, next) => {
       Number(req.params.id),
       req.body,
     );
-    res.json({id: course});
+    if (course) res.json({id: course});
+    else next(createError(400, 'Bad request'));
   } catch (error) {
     next(createError(500, error.message));
   }
@@ -34,11 +35,12 @@ module.exports.editById = async (req, res, next) => {
 
 module.exports.deleteById = async (req, res, next) => {
   try {
-    await services.documents.courses.deleteById(
+    const result = await services.documents.courses.deleteById(
       req.user,
       Number(req.params.id),
     );
-    res.json({message: 'successful delete'});
+    if (result) res.json({message: 'successful delete'});
+    else next(createError(400, 'Bad request'));
   } catch (error) {
     next(createError(500, error.message));
   }
