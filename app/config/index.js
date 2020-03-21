@@ -1,6 +1,6 @@
-const db = require('./database.json');
-const server = require('./server.json');
-const telegram = require('./telegram.json');
+const db = require('./database');
+const server = require('./server');
+const telegram = require('./telegram');
 
 module.exports = {
   server,
