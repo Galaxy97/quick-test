@@ -19,7 +19,7 @@ module.exports = (req, res, next) => {
 
   const secretKey = crypto
     .createHash('sha256')
-    .update(config.telegram.token)
+    .update(config.telegram.TOKEN)
     .digest();
 
   const hmac = crypto

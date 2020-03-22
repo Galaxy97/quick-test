@@ -1,5 +1,5 @@
 const createError = require('http-errors');
-const services = require('../services/');
+const services = require('../services');
 
 module.exports = async (req, res, next) => {
   const userArr = await services.lecturer.checkToken(

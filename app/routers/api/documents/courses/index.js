@@ -1,7 +1,8 @@
 const router = require('express').Router();
-const validator = require('../../../utils/validator');
+const validator = require('../../../../utils/validator');
+const queryValitator = require('../../../../utils/queryValidator');
 const validSchemes = require('./validators');
-const {documents} = require('../../../controllers');
+const {documents} = require('../../../../controllers');
 const subjects = require('../subjetcs');
 
 router.get('/', documents.courses.getAll); // get all courses this user
@@ -14,21 +15,19 @@ router.post(
 ); // create new couses
 
 router.put(
-  '/:id',
+  '/',
+  queryValitator(validSchemes.queryCoursesId),
   validator(validSchemes.editCourse),
   documents.courses.editById,
 ); // edit couses by id
 
 // router.delete('/courses', checkUser, documents.courses.deleteAll); // delete all couses
-router.delete('/:id', documents.courses.deleteById); // delete courses by id
+router.delete(
+  '/',
+  queryValitator(validSchemes.queryCoursesId),
+  documents.courses.deleteById,
+); // delete courses by id
 
-router.use(
-  '/:id/subjects',
-  (req, res, next) => {
-    req.coursesID = Number(req.params.id);
-    next();
-  },
-  subjects,
-); // handle subjects
+router.use('/subjects', subjects); // handle subjects valid in the next handle
 
 module.exports = router;
