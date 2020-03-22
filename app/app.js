@@ -4,7 +4,7 @@ const createError = require('http-errors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
-const routers = require('./routers');
+const api = require('./routers/api');
 
 // db connection
 require('./db');
@@ -18,7 +18,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({extended: true}));
 
-app.use('/api', routers);
+app.use('/api', api);
 
 app.use((req, res, next) => {
   next(createError(404, `Page Not Found ${req.path}`));
@@ -32,6 +32,7 @@ app.use((error, req, res, next) => {
     message: error.message,
     // when node_env === delelopment
     stack: error.stack,
+    body: error[0],
   });
 });
 

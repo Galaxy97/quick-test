@@ -1,4 +1,4 @@
-const config = require('../config').db;
+const config = require('./app/config').db;
 
 module.exports = {
   development: {
@@ -17,7 +17,7 @@ module.exports = {
     debug: true,
     migrations: {
       tableName: 'knex_migrations',
-      directory: '../migrations',
+      directory: './app/migrations',
     },
   },
 };

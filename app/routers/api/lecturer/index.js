@@ -1,8 +1,8 @@
 const router = require('express').Router();
-const validator = require('../../utils/validator');
+const validator = require('../../../utils/validator');
 const validSchemes = require('./validators');
-const {lecturer} = require('../../controllers');
-const checkHash = require('../../utils/checkHash');
+const {lecturer} = require('../../../controllers');
+const checkHash = require('../../../utils/checkHash');
 
 router.post(
   '/', // domain.com/api/lecturer
