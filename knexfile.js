@@ -12,8 +12,8 @@ module.exports = {
       password: config.PASSWORD || '',
     },
     pool: {
-      min: 2,
-      max: 10,
+      min: 1,
+      max: 2,
     },
     debug: true,
     migrations: {
@@ -31,8 +31,8 @@ module.exports = {
       password: config.PASSWORD || '',
     },
     pool: {
-      min: 2,
-      max: 10,
+      min: 1,
+      max: 2,
     },
     debug: true,
     migrations: {
