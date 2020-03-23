@@ -6,8 +6,11 @@ const schema = ajv.compile({
   properties: {
     first_name: {type: 'string'},
     last_name: {type: 'string'},
-    hash: {type: 'string'},
+    username: {type: 'string'},
+    photo_url: {type: 'string'},
+    auth_date: {type: 'number'},
     id: {type: 'number'},
+    hash: {type: 'string'},
   },
 });
 
