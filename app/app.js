@@ -19,7 +19,9 @@ app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/api', api);
-
+app.get('/', (req, res) => {
+  res.send('it have worked');
+});
 app.use((req, res, next) => {
   next(createError(404, `Page Not Found ${req.path}`));
 });
