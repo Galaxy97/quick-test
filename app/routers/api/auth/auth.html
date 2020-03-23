@@ -12,7 +12,7 @@
 <script type="text/javascript">
   function onTelegramAuth(user) {
     console.log(user);
-    document.getElementById('data').innerText = user.toString();
+    document.getElementById('data').innerText = JSON.stringify(user);
   }
 </script>
 </body>
