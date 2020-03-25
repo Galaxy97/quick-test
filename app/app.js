@@ -6,9 +6,6 @@ const morgan = require('morgan');
 
 const api = require('./routers/api');
 
-// db connection
-require('./db');
-
 const app = express();
 
 app.use(helmet());
@@ -40,7 +37,7 @@ app.use((error, req, res, next) => {
 
 console.log(`
 ***********************************************
-*********  Server is ready for usage  *********
+******* Application is ready for usage ********
 ***********************************************
 ***********************************************
 `);

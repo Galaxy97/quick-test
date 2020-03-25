@@ -3,7 +3,7 @@ exports.up = async knex => {
     table.increments('id');
     table.string('title').notNullable();
     table
-      .integer('subjects_id')
+      .integer('subject_id')
       .references('Subjects.id')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
