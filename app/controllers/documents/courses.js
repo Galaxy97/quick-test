@@ -23,7 +23,7 @@ module.exports.editById = async (req, res, next) => {
   try {
     const course = await services.documents.courses.editById(
       req.user,
-      Number(req.query.coursesId),
+      Number(req.query.courseId),
       req.body,
     );
     if (course) res.json({id: course});
@@ -37,7 +37,7 @@ module.exports.deleteById = async (req, res, next) => {
   try {
     const result = await services.documents.courses.deleteById(
       req.user,
-      Number(req.query.coursesId),
+      Number(req.query.courseId),
     );
     if (result) res.json({message: 'successful delete'});
     else next(createError(400, 'Bad request'));

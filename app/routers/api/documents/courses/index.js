@@ -16,7 +16,7 @@ router.post(
 
 router.put(
   '/',
-  queryValitator(validSchemes.queryCoursesId),
+  queryValitator(validSchemes.queryCourseId),
   validator(validSchemes.editCourse),
   documents.courses.editById,
 ); // edit couses by id
@@ -24,10 +24,10 @@ router.put(
 // router.delete('/courses', checkUser, documents.courses.deleteAll); // delete all couses
 router.delete(
   '/',
-  queryValitator(validSchemes.queryCoursesId),
+  queryValitator(validSchemes.queryCourseId),
   documents.courses.deleteById,
 ); // delete courses by id
 
-router.use('/subjects', subjects); // handle subjects valid in the next handle
+router.use('/subjects', queryValitator(validSchemes.queryCourseId), subjects); // handle subjects valid in the next handle
 
 module.exports = router;

@@ -2,9 +2,8 @@ const ajv = require('ajv')({coerceTypes: true});
 
 const schema = ajv.compile({
   type: 'object',
-  required: ['coursesId', 'subjectId'],
+  required: ['subjectId'],
   properties: {
-    coursesId: {type: 'number'},
     subjectId: {type: 'number'},
   },
 });

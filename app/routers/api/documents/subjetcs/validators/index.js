@@ -1,7 +1,7 @@
-const createSubjects = require('./createSubjects');
+const createSubject = require('./createSubject');
 const querySubjectId = require('./querySubjectId');
 
 module.exports = {
-  createSubjects,
+  createSubject,
   querySubjectId,
 };

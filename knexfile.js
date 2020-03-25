@@ -1,6 +1,5 @@
 const config = require('./app/config').db;
 
-console.log(config);
 module.exports = {
   development: {
     client: 'postgresql',

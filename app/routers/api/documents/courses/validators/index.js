@@ -1,9 +1,9 @@
 const createCourse = require('./createCourse');
 const editCourse = require('./editCourse');
-const queryCoursesId = require('./queryCoursesID');
+const queryCourseId = require('./queryCourseID');
 
 module.exports = {
   createCourse,
   editCourse,
-  queryCoursesId,
+  queryCourseId,
 };

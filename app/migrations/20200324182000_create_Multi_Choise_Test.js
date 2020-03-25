@@ -1,10 +1,12 @@
 exports.up = async knex => {
-  return knex.schema.createTable('Subjects', table => {
+  return knex.schema.createTable('MultiChoice', table => {
     table.increments('id');
     table.string('title').notNullable();
+    table.string('subtitle').notNullable();
+    table.json('answers').notNullable();
     table
-      .integer('course_id')
-      .references('Courses.id')
+      .integer('topic_id')
+      .references('Topics.id')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
     table.timestamp('created_at').defaultTo(knex.fn.now());
@@ -13,5 +15,5 @@ exports.up = async knex => {
 };
 
 exports.down = knex => {
-  return knex.schema.dropTable('Courses');
+  return knex.schema.dropTable('MultiChoice');
 };

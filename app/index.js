@@ -3,9 +3,18 @@ const app = require('./app');
 const server = require('http').createServer(app);
 
 const config = require('./config');
+const knex = require('./db');
 
-server.listen(config.server.PORT, () => {
-  console.log(
-    `Server running at ${config.server.HOST} port ${config.server.PORT}`,
-  );
-});
+knex
+  .raw('select 1+1 as result')
+  .then(() => {
+    server.listen(config.server.PORT, () => {
+      console.log(
+        `Server running at ${config.server.HOST} port ${config.server.PORT}`,
+      );
+    });
+  })
+  .catch(err => {
+    console.log(err);
+    process.exit(1);
+  });

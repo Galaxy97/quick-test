@@ -1,10 +1,10 @@
 const dataBase = require('../../../db');
 
-module.exports.getAll = async coursesID => {
+module.exports.getAll = async courseID => {
   // get all subjects this cours`s
   const subjects = await dataBase('Subjects')
     .select()
-    .where({courses_id: coursesID});
+    .where({course_id: courseID});
   return subjects;
 };
 
@@ -13,27 +13,27 @@ module.exports.create = async (id, body) => {
   const subject = await dataBase('Subjects')
     .insert({
       title: body.title,
-      courses_id: id,
+      course_id: id,
     })
     .returning('id');
   if (subject.length > 0) return subject[0];
   return false;
 };
 
-module.exports.editById = async (coursesID, id, body) => {
+module.exports.editById = async (courseID, id, body) => {
   // edit subject by id
   const subject = await dataBase('Subjects')
-    .where({id, courses_id: coursesID})
+    .where({id, course_id: courseID})
     .update({title: body.title})
     .returning('id');
   if (subject.length > 0) return subject[0];
   return false;
 };
 
-module.exports.deleteById = async (coursesID, id) => {
+module.exports.deleteById = async (courseID, id) => {
   // delete subject by id
   const res = await dataBase('Subjects')
-    .where({id, courses_id: coursesID})
+    .where({id, course_id: courseID})
     .del();
   if (res) return true;
   return false;
