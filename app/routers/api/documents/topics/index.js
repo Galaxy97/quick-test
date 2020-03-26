@@ -4,6 +4,7 @@ const queryValitator = require('../../../../utils/queryValidator');
 const validSchemes = require('./validators');
 const {documents} = require('../../../../controllers');
 const questions = require('../questions');
+const checkId = require('../../../../utils/exsistIdinDB');
 
 router.get('/', documents.topics.getAll); // get all courses this user
 
@@ -16,6 +17,7 @@ router.post('/', validator(validSchemes.createTopic), documents.topics.create); 
 router.put(
   '/',
   queryValitator(validSchemes.queryTopicId),
+  checkId('Topics', 'id', 'topicId'),
   validator(validSchemes.createTopic),
   documents.topics.editById,
 ); // create new couses
@@ -23,6 +25,7 @@ router.put(
 router.delete(
   '/',
   queryValitator(validSchemes.queryTopicId),
+  checkId('Topics', 'id', 'topicId'),
   documents.topics.deleteById,
 ); // get all courses this user
 
