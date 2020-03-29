@@ -21,7 +21,7 @@ router.post(
 router.put(
   '/',
   queryValitator(validSchemes.querySubjectId),
-  checkId('Subjects', 'id', 'subjectId'),
+  checkId('subjects', 'id', 'subjectId'),
   validator(validSchemes.createSubject),
   documents.subjects.editById,
 ); // create new couses
@@ -29,7 +29,7 @@ router.put(
 router.delete(
   '/',
   queryValitator(validSchemes.querySubjectId),
-  checkId('Subjects', 'id', 'subjectId'),
+  checkId('subjects', 'id', 'subjectId'),
   documents.subjects.deleteById,
 ); // get all courses this user
 

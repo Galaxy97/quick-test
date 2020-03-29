@@ -17,7 +17,7 @@ router.post('/', validator(validSchemes.createTopic), documents.topics.create); 
 router.put(
   '/',
   queryValitator(validSchemes.queryTopicId),
-  checkId('Topics', 'id', 'topicId'),
+  checkId('topics', 'id', 'topicId'),
   validator(validSchemes.createTopic),
   documents.topics.editById,
 ); // create new couses
@@ -25,7 +25,7 @@ router.put(
 router.delete(
   '/',
   queryValitator(validSchemes.queryTopicId),
-  checkId('Topics', 'id', 'topicId'),
+  checkId('topics', 'id', 'topicId'),
   documents.topics.deleteById,
 ); // get all courses this user
 

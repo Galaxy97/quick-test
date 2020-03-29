@@ -5,11 +5,7 @@ const validSchemes = require('./validators');
 const {documents} = require('../../../../../controllers');
 const checkId = require('../../../../../utils/exsistIdinDB');
 
-router.get(
-  '/',
-  queryValitator(validSchemes.queryQuestionId),
-  documents.questions.multiChoice.getAll,
-); // get all courses this user
+router.get('/', documents.questions.multiChoice.getAll); // get all courses this user
 
 // router.get('/:id', (req, res) => {
 //   res.send(`get ${req.params.id} subjects from ${req.coursesID}`);
@@ -24,7 +20,7 @@ router.post(
 router.put(
   '/',
   queryValitator(validSchemes.queryQuestionId),
-  checkId('MultiChoice', 'id', 'questionId'),
+  checkId('multi_choice', 'id', 'questionId'),
   validator(validSchemes.multiCreate),
   documents.questions.multiChoice.editById,
 ); // create new couses
@@ -32,7 +28,7 @@ router.put(
 router.delete(
   '/',
   queryValitator(validSchemes.queryQuestionId),
-  checkId('MultiChoice', 'id', 'questionId'),
+  checkId('multi_choice', 'id', 'questionId'),
   documents.questions.multiChoice.deleteById,
 ); // get all courses this user
 

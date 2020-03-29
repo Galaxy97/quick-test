@@ -1,10 +1,10 @@
 exports.up = async knex => {
-  return knex.schema.createTable('Topics', table => {
+  return knex.schema.createTable('topics', table => {
     table.increments('id');
     table.string('title').notNullable();
     table
       .integer('subject_id')
-      .references('Subjects.id')
+      .references('subjects.id')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
     table.timestamp('created_at').defaultTo(knex.fn.now());
@@ -13,5 +13,5 @@ exports.up = async knex => {
 };
 
 exports.down = knex => {
-  return knex.schema.dropTable('Topics');
+  return knex.schema.dropTable('topics');
 };

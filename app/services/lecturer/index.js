@@ -11,11 +11,11 @@ module.exports.authorization = async body => {
     else knexRequest.telegram_id = body.id;
     const lecturer = await dataBase
       .select('token')
-      .from('Lecturers')
+      .from('lecturers')
       .where(knexRequest);
     if (lecturer.length === 0) {
       // registr this user
-      const res = await dataBase('Lecturers')
+      const res = await dataBase('lecturers')
         .insert({
           first_name: body.first_name,
           last_name: body.last_name,
@@ -38,7 +38,7 @@ module.exports.authorization = async body => {
 
 module.exports.checkToken = async token => {
   if (uuidValidate(token)) {
-    const result = await dataBase.from('Lecturers').where({token});
+    const result = await dataBase.from('lecturers').where({token});
     return result;
   }
   return false;
