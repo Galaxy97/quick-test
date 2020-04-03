@@ -26,7 +26,9 @@
     "knex": "^0.20.10",
     "morgan": "^1.9.1",
     "pg": "^7.18.2",
-    "uuid-validate": "0.0.3"
+    "socket.io": "^2.3.0",
+    "uuid-validate": "0.0.3",
+    "ws": "^7.2.3"
   },
   "husky": {
     "hooks": {

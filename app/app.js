@@ -17,6 +17,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/api', api);
 app.get('/', (req, res) => {
+  // will be depracated
   res.send('it have worked');
 });
 app.use((req, res, next) => {

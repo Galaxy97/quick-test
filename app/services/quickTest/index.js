@@ -40,3 +40,41 @@ module.exports.create = async ({lecturerId, questionsId, title}) => {
   if (testId) return code;
   return false;
 };
+
+module.exports.checkTestCode = async code => {
+  const [test] = await dataBase('tests')
+    .select(
+      'id',
+      'title',
+      dataBase.raw('COUNT(test_questions.test_id) :: integer as count'),
+    )
+    .innerJoin('test_questions', 'test_questions.test_id', 'tests.id')
+    .where({code, is_open: true})
+    .groupBy('id');
+
+  return test;
+};
+
+module.exports.checkStudent = async student => {
+  try {
+    const [participant] = await dataBase('participants')
+      .select('telegram_id')
+      .where({telegram_id: student.participant_id});
+    if (!participant) {
+      await dataBase('participants').insert({
+        telegram_id: student.participant_id,
+        first_name: student.first_name,
+        last_name: student.last_name,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports.addStudentInTest = async (telegramId, testId) => {
+  await dataBase('test_participants').insert({
+    test_id: testId,
+    telegram_id: telegramId,
+  });
+};
