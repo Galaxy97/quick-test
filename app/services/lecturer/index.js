@@ -39,7 +39,7 @@ module.exports.authorization = async body => {
 module.exports.checkToken = async token => {
   if (uuidValidate(token)) {
     const result = await dataBase.from('lecturers').where({token});
-    return result;
+    return result[0];
   }
   return false;
 };

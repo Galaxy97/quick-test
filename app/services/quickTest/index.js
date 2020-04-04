@@ -78,3 +78,59 @@ module.exports.addStudentInTest = async (telegramId, testId) => {
     telegram_id: telegramId,
   });
 };
+
+module.exports.checkSocketId = async (socketId, code) => {
+  const [test] = await dataBase('tests')
+    .select('id')
+    .where({code});
+  const [socket] = await dataBase('test_lecturers')
+    .select()
+    .where({test_id: test.id});
+  if (!socket) {
+    await dataBase('test_lecturers').insert({
+      test_id: test.id,
+      socket_id: socketId,
+    });
+  } else {
+    await dataBase('test_lecturers')
+      .update({
+        test_id: test.id,
+        socket_id: socketId,
+      })
+      .where({test_id: test.id});
+  }
+};
+
+module.exports.getLecturerId = async testId => {
+  const [test] = await dataBase('test_lecturers')
+    .select('socket_id')
+    .where({test_id: testId});
+  return test.socket_id;
+};
+
+// eslint-disable-next-line consistent-return
+module.exports.getParticipants = async testId => {
+  try {
+    const participants = await dataBase('test_participants')
+      .select('telegram_id')
+      .where({test_id: testId});
+    const participantsID = [];
+    participants.forEach(part => {
+      participantsID.push(part.id);
+    });
+    return participantsID;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// eslint-disable-next-line consistent-return
+module.exports.closeTest = async testId => {
+  try {
+    await dataBase('tests')
+      .update({is_open: false})
+      .where({test_id: testId});
+  } catch (error) {
+    console.log(error);
+  }
+};

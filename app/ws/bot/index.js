@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-constructor */
 const WebSocket = require('ws');
 // const services = require('../../services');
-const controller = require('../../controllers');
+const quickTest = require('../../controllers/quickTest');
 const validator = require('../../utils/socketValidator');
 const schems = require('./validators');
 
@@ -23,7 +23,7 @@ class WsBot {
               // eslint-disable-next-line no-case-declarations
               const validMesseage = validator(schems.addStudents, data);
               if (validMesseage) throw new Error(validMesseage[0].message);
-              controller.quickTest.addStudent(socket, data);
+              quickTest.addStudent(socket, data);
               break;
             default:
               throw new Error('path not found');
@@ -38,14 +38,12 @@ class WsBot {
       });
     });
     this.wss.on('close', () => {
-      this.telegram = null;
       console.log('the bot disconnected');
     });
   }
 
-  launch() {
-    if (!this.telegram) console.log('errr');
-    this.telegram.send('launch');
+  sendBotMesseage(message) {
+    this.wss.clients[0].client.send(message);
   }
 }
 

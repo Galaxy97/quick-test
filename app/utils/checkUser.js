@@ -8,6 +8,6 @@ module.exports = async (req, res, next) => {
   if (!userArr || userArr.length === 0) {
     next(createError(401, 'Unauthorized'));
   }
-  [req.user] = userArr;
+  req.user = userArr;
   next();
 };

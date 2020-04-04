@@ -1,5 +1,7 @@
 const createError = require('http-errors');
 const services = require('../../services');
+const Lecturer = require('../../ws/lecturers');
+const Bot = require('../../ws/bot');
 
 module.exports.createTest = async (req, res, next) => {
   try {
@@ -43,6 +45,14 @@ module.exports.addStudent = async (socket, stdData) => {
         count: test.count,
       }),
     );
+    const send = {
+      path: 'newStudent',
+      firstName: stdData.first_name,
+      lastName: stdData.last_name,
+    };
+    // send message to lecturer
+    const lecturerSocketId = await services.quickTest.getLecturerId(test.id);
+    Lecturer.sendLecturerMesseage(lecturerSocketId, JSON.stringify(send));
   } catch (error) {
     socket.send(
       JSON.stringify({
@@ -50,5 +60,41 @@ module.exports.addStudent = async (socket, stdData) => {
         messeage: String(error),
       }),
     );
+  }
+};
+
+module.exports.newLecturerConnection = async (socket, headers) => {
+  try {
+    // get lecturer id by token
+    const lecturer = await services.lecturer.checkToken(headers.token); // lecturer.id
+    // create socketId
+    const socketId = lecturer.id + headers.code;
+    // check if socketId is exsist
+    // socketId == socket_lecturer_id
+    await services.quickTest.checkSocketId(socketId, headers.code);
+    // assign socketid to socket
+    // eslint-disable-next-line no-param-reassign
+    socket.id = socketId;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports.launchTest = async code => {
+  try {
+    // get test id by code
+    const test = await services.quickTest.checkTestCode(code);
+    // gett all participant from test
+    const participants = await services.quickTest.getParticipants(test.id);
+    // un active test
+    await services.quickTest.closeTest(test.id);
+    // send message them
+    const msg = {
+      path: 'launch_test',
+      participants_id: participants,
+    };
+    Bot.sendBotMesseage(msg);
+  } catch (error) {
+    console.error(error);
   }
 };
