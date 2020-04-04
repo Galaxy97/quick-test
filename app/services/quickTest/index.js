@@ -116,7 +116,7 @@ module.exports.getParticipants = async testId => {
       .where({test_id: testId});
     const participantsID = [];
     participants.forEach(part => {
-      participantsID.push(part.id);
+      participantsID.push(part.telegram_id);
     });
     return participantsID;
   } catch (error) {
@@ -129,7 +129,7 @@ module.exports.closeTest = async testId => {
   try {
     await dataBase('tests')
       .update({is_open: false})
-      .where({test_id: testId});
+      .where({id: testId});
   } catch (error) {
     console.log(error);
   }

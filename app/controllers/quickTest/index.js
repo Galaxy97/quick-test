@@ -3,6 +3,14 @@ const services = require('../../services');
 const Lecturer = require('../../ws/lecturers');
 const Bot = require('../../ws/bot');
 
+async function provideTest(test, participants) {
+  try {
+    const lecturerSocketID = test.lecturer_id + test.code;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports.createTest = async (req, res, next) => {
   try {
     const code = await services.quickTest.create({
@@ -93,7 +101,8 @@ module.exports.launchTest = async code => {
       path: 'launch_test',
       participants_id: participants,
     };
-    Bot.sendBotMesseage(msg);
+    Bot.sendBotMesseage(JSON.stringify(msg));
+    provideTest(test, participants);
   } catch (error) {
     console.error(error);
   }

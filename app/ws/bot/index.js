@@ -43,7 +43,11 @@ class WsBot {
   }
 
   sendBotMesseage(message) {
-    this.wss.clients[0].client.send(message);
+    this.wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
   }
 }
 
