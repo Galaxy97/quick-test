@@ -51,7 +51,26 @@ module.exports.checkTestCode = async code => {
     .innerJoin('test_questions', 'test_questions.test_id', 'tests.id')
     .where({code, is_open: true})
     .groupBy('id');
+  return test;
+};
 
+module.exports.getTestByCode = async code => {
+  const [test] = await dataBase('tests')
+    .select(
+      'id',
+      'lecturer_id',
+      'code',
+      dataBase.raw('COUNT(test_questions.test_id) :: integer as count'),
+    )
+    .innerJoin('test_questions', 'test_questions.test_id', 'tests.id')
+    .where({code, is_open: true})
+    .groupBy('id');
+  return test;
+};
+module.exports.getTestById = async id => {
+  const [test] = await dataBase('tests')
+    .select()
+    .where({id});
   return test;
 };
 
@@ -72,11 +91,18 @@ module.exports.checkStudent = async student => {
   }
 };
 
+// eslint-disable-next-line consistent-return
 module.exports.addStudentInTest = async (telegramId, testId) => {
-  await dataBase('test_participants').insert({
+  const rows = await dataBase('test_participants').where({
     test_id: testId,
     telegram_id: telegramId,
   });
+  if (rows.length === 0) {
+    await dataBase('test_participants').insert({
+      test_id: testId,
+      telegram_id: telegramId,
+    });
+  } else return true;
 };
 
 module.exports.checkSocketId = async (socketId, code) => {
@@ -133,4 +159,50 @@ module.exports.closeTest = async testId => {
   } catch (error) {
     console.log(error);
   }
+};
+
+// eslint-disable-next-line consistent-return
+module.exports.getQuestionsId = async testId => {
+  try {
+    const ids = await dataBase('test_questions')
+      .select('question_id')
+      .where({test_id: testId});
+    console.log(ids);
+    return ids;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports.setResult = async ({
+  testId,
+  participantId,
+  questionId,
+  answer,
+}) => {
+  await dataBase('test_results').insert({
+    test_id: testId,
+    telegram_id: participantId,
+    question_id: questionId,
+    participant_answers: JSON.stringify(answer),
+  });
+};
+
+module.exports.lookingPartWithOutAnswer = async (
+  testId,
+  questionId,
+  participants,
+) => {
+  console.log(testId, questionId, participants);
+  let partWithAnswer = await dataBase('test_results')
+    .select('telegram_id')
+    .where({test_id: testId, question_id: questionId});
+  partWithAnswer = partWithAnswer.map(obj => obj.telegram_id);
+  const withOutAnswer = [];
+  participants.forEach(id => {
+    if (partWithAnswer.indexOf(id) === -1) {
+      withOutAnswer.push(id);
+    }
+  });
+  return withOutAnswer;
 };

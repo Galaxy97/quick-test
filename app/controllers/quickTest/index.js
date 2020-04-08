@@ -1,19 +1,12 @@
+/* eslint-disable no-param-reassign */
+
 const createError = require('http-errors');
 const services = require('../../services');
-const Lecturer = require('../../ws/lecturers');
-const Bot = require('../../ws/bot');
-
-async function provideTest(test, participants) {
-  try {
-    const lecturerSocketID = test.lecturer_id + test.code;
-  } catch (error) {
-    console.log(error);
-  }
-}
+const Test = require('./Test');
 
 module.exports.createTest = async (req, res, next) => {
   try {
-    const code = await services.quickTest.create({
+    const code = await Test.create({
       lecturerId: req.user.id,
       questionsId: req.body.questionsId,
       title: req.body.title,
@@ -26,48 +19,12 @@ module.exports.createTest = async (req, res, next) => {
 };
 
 // eslint-disable-next-line consistent-return
-module.exports.addStudent = async (socket, stdData) => {
+module.exports.addStudent = async (req, res, next) => {
   try {
-    // check code
-    const test = await services.quickTest.checkTestCode(stdData.code);
-    if (!test) {
-      socket.send(
-        JSON.stringify({
-          path: 'res_add_student',
-          participant_id: stdData.participant_id,
-          messeage: 'this test is not exsist',
-        }),
-      );
-      return false;
-    }
-    // find or write data this student
-    await services.quickTest.checkStudent(stdData);
-    // add student in a wainting room
-    await services.quickTest.addStudentInTest(stdData.participant_id, test.id);
-    // emit student 'res_add_student'
-    socket.send(
-      JSON.stringify({
-        path: 'res_add_student',
-        participant_id: stdData.participant_id,
-        testTitle: test.title,
-        count: test.count,
-      }),
-    );
-    const send = {
-      path: 'newStudent',
-      firstName: stdData.first_name,
-      lastName: stdData.last_name,
-    };
-    // send message to lecturer
-    const lecturerSocketId = await services.quickTest.getLecturerId(test.id);
-    Lecturer.sendLecturerMesseage(lecturerSocketId, JSON.stringify(send));
+    const message = await Test.addStudent(req.body);
+    res.json(message);
   } catch (error) {
-    socket.send(
-      JSON.stringify({
-        path: 'error',
-        messeage: String(error),
-      }),
-    );
+    next(createError(500, error.message));
   }
 };
 
@@ -81,29 +38,25 @@ module.exports.newLecturerConnection = async (socket, headers) => {
     // socketId == socket_lecturer_id
     await services.quickTest.checkSocketId(socketId, headers.code);
     // assign socketid to socket
-    // eslint-disable-next-line no-param-reassign
     socket.id = socketId;
   } catch (error) {
     console.log(error);
   }
 };
 
-module.exports.launchTest = async code => {
+module.exports.launchTest = code => {
   try {
-    // get test id by code
-    const test = await services.quickTest.checkTestCode(code);
-    // gett all participant from test
-    const participants = await services.quickTest.getParticipants(test.id);
-    // un active test
-    await services.quickTest.closeTest(test.id);
-    // send message them
-    const msg = {
-      path: 'launch_test',
-      participants_id: participants,
-    };
-    Bot.sendBotMesseage(JSON.stringify(msg));
-    provideTest(test, participants);
+    Test.launchTest(code);
   } catch (error) {
     console.error(error);
+  }
+};
+
+module.exports.setResult = async (req, res, next) => {
+  try {
+    await Test.setResult(req.body);
+    res.json({message: 'successful saved'});
+  } catch (error) {
+    next(createError(500, error.message));
   }
 };

@@ -10,7 +10,16 @@ const getAll = async topictId => {
   return questions;
 };
 
+const getById = async id => {
+  const [question] = await dataBase('questions')
+    .select()
+    .where({id})
+    .leftJoin('multi_choice', 'multi_choice.question_id', 'questions.id');
+  return question;
+};
+
 module.exports = {
   multiChoice,
   getAll,
+  getById,
 };

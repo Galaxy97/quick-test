@@ -1,15 +1,8 @@
 const router = require('express').Router();
-const validator = require('../../../utils/validator');
-const validSchemes = require('./validators');
-const quickTest = require('../../../controllers/quickTest');
-const checkQuestionsId = require('../../../utils/checkQuestionIds');
+const lecturer = require('./lecturer');
+const bot = require('./bot');
 
-// create test
-router.post(
-  '/',
-  validator(validSchemes.createTest),
-  checkQuestionsId,
-  quickTest.createTest,
-);
+router.use('/lecturer', lecturer);
+router.use('/bot', bot);
 
 module.exports = router;
