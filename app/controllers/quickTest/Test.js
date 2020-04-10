@@ -43,6 +43,7 @@ async function handleQuestion(actualRepeat, id) {
           turn[id].participants,
         );
         await services.bot.partWithoutAnswer({
+          testId: id,
           participants: badParticipants,
           questionId: turn[id].questions[actualRepeat].id,
         });
@@ -80,7 +81,7 @@ module.exports.setResult = async body => {
       turn[test.id].count = 0;
       setTimeout(() => {
         handleQuestion(turn[test.id].actual, test.id);
-      }, 2500);
+      }, 5000);
     } else turn[test.id].count++;
   } catch (error) {
     console.error(error);
@@ -174,7 +175,6 @@ module.exports.launchTest = async code => {
   // await services.quickTest.closeTest(test.id);
   // send message them
   const msg = {
-    path: 'launch_test',
     participants_id: participants,
   };
   services.bot.launchTest(msg);

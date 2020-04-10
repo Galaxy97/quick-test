@@ -1,5 +1,7 @@
 /* eslint-disable no-useless-constructor */
 const WebSocket = require('ws');
+const url = require('url');
+const querystring = require('querystring');
 // const services = require('../../services');
 const quickTest = require('../../controllers/quickTest');
 const validator = require('../../utils/socketValidator');
@@ -13,11 +15,13 @@ class WsLecturers {
   handle() {
     this.wss.on('connection', (socket, request) => {
       try {
-        const validMesseage = validator(schems.newConnection, request.headers);
+        const queryStr = url.parse(request.url);
+        const query = querystring.parse(queryStr.query);
+        const validMesseage = validator(schems.newConnection, query);
         if (validMesseage) throw new Error(validMesseage[0].message);
 
         console.log('new lecturer', request);
-        quickTest.newLecturerConnection(socket, request.headers);
+        quickTest.newLecturerConnection(socket, query);
         socket.on('message', raw => {
           console.log(raw);
           try {
