@@ -27,6 +27,10 @@ module.exports.getByToken = async token => {
 };
 
 module.exports.registr = async (uuid, user) => {
+  await dataBase
+    .from('temp_users')
+    .delete()
+    .where({token: uuid});
   await dataBase.from('lecturers').insert({
     first_name: user.first_name,
     last_name: user.last_name,
