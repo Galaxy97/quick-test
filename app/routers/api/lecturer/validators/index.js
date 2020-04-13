@@ -1,5 +1,5 @@
-const authorization = require('./authorization');
+const check = require('./check');
 
 module.exports = {
-  authorization,
+  check,
 };
