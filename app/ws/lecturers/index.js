@@ -11,7 +11,7 @@ const schems = require('./validators');
 
 class WsLecturers {
   constructor() {
-    this.wss = new WebSocket.Server({port: config.ws.port});
+    this.wss = new WebSocket.Server({port: config.ws.PORT});
   }
 
   handle() {

@@ -2,7 +2,7 @@
 /* eslint-disable no-plusplus */
 
 const services = require('../../services');
-const Lecturer = require('../../ws/lecturers').default;
+const Lecturer = require('../../ws/lecturers');
 
 // bad code
 const turn = {}; // it will be redis ala cache or buffer for all users
