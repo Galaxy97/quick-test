@@ -10,5 +10,5 @@ exports.up = async knex => {
 };
 
 exports.down = knex => {
-  return knex.schema.dropTable('test_results');
+  return knex.schema.dropTable('test_lecturers');
 };
