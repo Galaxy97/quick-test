@@ -11,10 +11,10 @@ module.exports = {
       password: config.PASSWORD || '',
     },
     pool: {
-      min: 2,
-      max: 10,
+      min: 1,
+      max: 2,
     },
-    debug: true,
+    debug: false,
     migrations: {
       tableName: 'knex_migrations',
       directory: './app/migrations',
@@ -30,8 +30,8 @@ module.exports = {
       password: config.PASSWORD || '',
     },
     pool: {
-      min: 2,
-      max: 10,
+      min: 1,
+      max: 2,
     },
     debug: true,
     migrations: {

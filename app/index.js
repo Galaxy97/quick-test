@@ -8,10 +8,12 @@ const server = require('http').createServer(app);
 const Lecturers = require('./ws/lecturers');
 const config = require('./config');
 const knex = require('./db');
+const authBot = require('./utils/authBot');
 
 knex
   .raw('select 1+1 as result')
   .then(() => {
+    authBot.launch();
     server.listen(config.server.PORT, () => {
       Lecturers.handle();
       console.log(

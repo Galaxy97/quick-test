@@ -180,12 +180,21 @@ module.exports.setResult = async ({
   questionId,
   answer,
 }) => {
-  await dataBase('test_results').insert({
+  const [record] = await dataBase('test_results').where({
     test_id: testId,
     telegram_id: participantId,
     question_id: questionId,
-    participant_answers: JSON.stringify(answer),
   });
+  if (!record) {
+    await dataBase('test_results').insert({
+      test_id: testId,
+      telegram_id: participantId,
+      question_id: questionId,
+      participant_answers: JSON.stringify(answer),
+    });
+    return true;
+  }
+  return false;
 };
 
 module.exports.lookingPartWithOutAnswer = async (

@@ -1,6 +1,6 @@
 require('dotenv').config();
 
 module.exports = {
-  TOKEN_AUTH: process.env.TELEGRAM_AUTH_TOKEN,
-  TOKEN_IO: process.env.TELEGRAM_IO_TOKEN,
+  AUTH_TOKEN: process.env.TELEGRAM_AUTH_TOKEN,
+  BOT_URL: process.env.TELEGRAM_BOT_URL,
 };

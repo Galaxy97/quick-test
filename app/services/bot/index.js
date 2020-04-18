@@ -1,9 +1,10 @@
 const axios = require('axios');
+const config = require('../../config');
 
 module.exports.launchTest = async msg => {
   try {
     const result = await axios.post(
-      'http://127.0.0.1:3001/quicktest/launchtest',
+      `${config.telegram.BOT_URL}/quicktest/launchtest`,
       msg,
     );
     console.log(result);
@@ -15,7 +16,7 @@ module.exports.launchTest = async msg => {
 module.exports.sendQuestion = async msg => {
   try {
     const result = await axios.post(
-      'http://127.0.0.1:3001/quicktest/question',
+      `${config.telegram.BOT_URL}/quicktest/question`,
       msg,
     );
     console.log(result);
@@ -26,7 +27,7 @@ module.exports.sendQuestion = async msg => {
 module.exports.partWithoutAnswer = async msg => {
   try {
     const result = await axios.post(
-      'http://127.0.0.1:3001/quicktest/question/result',
+      `${config.telegram.BOT_URL}/quicktest/question/result`,
       msg,
     );
     console.log(result);

@@ -2,7 +2,7 @@
 /* eslint-disable no-plusplus */
 
 const services = require('../../services');
-const Lecturer = require('../../ws/lecturers');
+const Lecturer = require('../../ws/lecturers').default;
 
 // bad code
 const turn = {}; // it will be redis ala cache or buffer for all users
@@ -27,11 +27,20 @@ async function handleQuestion(actualRepeat, id) {
   if (actualRepeat < turn[id].attempts) {
     turn[id].questions[actualRepeat].testId = turn[id].test.id;
     const msg = {
-      participants: turn[id].participants,
+      participants_id: turn[id].participants,
       question: turn[id].questions[actualRepeat],
     };
     // send partcicipant question
     await services.bot.sendQuestion(msg);
+    const lecturerSocketID = turn[id].test.lecturer_id + turn[id].test.code;
+
+    Lecturer.sendLecturerMesseage(
+      lecturerSocketID,
+      JSON.stringify({
+        path: 'question',
+        question: turn[id].questions[actualRepeat],
+      }),
+    );
     setTimeout(async () => {
       // get patricipants without response on question
       if (turn[id].actual === actualRepeat) {
@@ -42,11 +51,16 @@ async function handleQuestion(actualRepeat, id) {
           turn[id].questions[actualRepeat].id,
           turn[id].participants,
         );
-        await services.bot.partWithoutAnswer({
+        services.bot.partWithoutAnswer({
           testId: id,
-          participants: badParticipants,
+          participants_id: badParticipants,
           questionId: turn[id].questions[actualRepeat].id,
         });
+        turn[id].actual++;
+        turn[id].count = 0;
+        setTimeout(() => {
+          handleQuestion(turn[id].actual, id);
+        }, 5000);
       }
     }, 20000); // timeout
   }
@@ -55,12 +69,15 @@ async function handleQuestion(actualRepeat, id) {
 module.exports.setResult = async body => {
   try {
     // write in database
-    await services.quickTest.setResult({
+    const record = await services.quickTest.setResult({
       testId: body.test_id,
       participantId: body.participant_id,
       questionId: body.question_id,
       answer: body.answer,
     });
+    if (!record) {
+      return false; // do not save
+    }
     const lecturerSocketID =
       turn[body.test_id].test.lecturer_id + turn[body.test_id].test.code;
     Lecturer.sendLecturerMesseage(
@@ -86,13 +103,11 @@ module.exports.setResult = async body => {
   } catch (error) {
     console.error(error);
   }
+  return true;
 };
 
 async function prepareTest(test, participants) {
   try {
-    // const lecturerSocketID = test.lecturer_id + test.code;
-    // console.log(lecturerSocketID, participants);
-
     const questionsId = await services.quickTest.getQuestionsId(test.id);
     const questionsFunc = [];
 
@@ -158,7 +173,6 @@ module.exports.addStudent = async body => {
   // send message to lecturer
   const lecturerSocketId = await services.quickTest.getLecturerId(test.id);
   Lecturer.sendLecturerMesseage(lecturerSocketId, JSON.stringify(send));
-  // emit student 'res_add_student'
   return {
     participant_id: body.participant_id,
     testTitle: test.title,
@@ -172,7 +186,7 @@ module.exports.launchTest = async code => {
   // gett all participant from test
   const participants = await services.quickTest.getParticipants(test.id);
   // un active test
-  // await services.quickTest.closeTest(test.id);
+  await services.quickTest.closeTest(test.id);
   // send message them
   const msg = {
     participants_id: participants,

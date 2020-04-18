@@ -14,6 +14,9 @@ module.exports.create = async (user, body) => {
     .insert({
       title: body.title,
       lecturer_id: user.id,
+      description: body.description,
+      color_top: body.colorTop,
+      color_bottom: body.colorBottom,
     })
     .returning('id');
   if (course.length > 0) return course[0];
@@ -24,7 +27,13 @@ module.exports.editById = async (user, id, body) => {
   // edit cours by id
   const course = await dataBase('courses')
     .where({id, lecturer_id: user.id})
-    .update({title: body.title})
+    .update({
+      title: body.title,
+      lecturer_id: user.id,
+      description: body.description,
+      color_top: body.colorTop,
+      color_bottom: body.colorBottom,
+    })
     .returning('id');
   if (course.length > 0) return course[0];
   return false;

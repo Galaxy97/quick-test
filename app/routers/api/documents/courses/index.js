@@ -17,7 +17,7 @@ router.post(
 router.put(
   '/',
   queryValitator(validSchemes.queryCourseId),
-  validator(validSchemes.editCourse),
+  validator(validSchemes.createCourse),
   documents.courses.editById,
 ); // edit couses by id
 

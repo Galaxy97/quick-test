@@ -31,7 +31,7 @@ module.exports.addStudent = async (req, res, next) => {
 module.exports.newLecturerConnection = async (socket, headers) => {
   try {
     // get lecturer id by token
-    const lecturer = await services.lecturer.checkToken(headers.token); // lecturer.id
+    const lecturer = await services.lecturer.checkLecturerToken(headers.token); // lecturer.id
     // create socketId
     const socketId = lecturer.id + headers.code;
     // check if socketId is exsist
