@@ -1,4 +1,5 @@
 const dataBase = require('../../db');
+const config = require('../../config');
 
 const makeCode = () => {
   let result = '';
@@ -214,4 +215,13 @@ module.exports.lookingPartWithOutAnswer = async (
     }
   });
   return withOutAnswer;
+};
+
+module.exports.setDomain = domain => {
+  config.telegram.BOT_URL = domain;
+  return true;
+};
+
+module.exports.getDomain = () => {
+  return config.telegram.BOT_URL;
 };

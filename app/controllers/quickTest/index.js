@@ -60,3 +60,20 @@ module.exports.setResult = async (req, res, next) => {
     next(createError(500, error.message));
   }
 };
+
+module.exports.setDomain = async (req, res, next) => {
+  try {
+    services.quickTest.setDomain(req.body.domain);
+    res.json({message: 'successful saved'});
+  } catch (error) {
+    next(createError(500, error.message));
+  }
+};
+
+module.exports.getDomain = async (req, res, next) => {
+  try {
+    res.json({message: services.quickTest.getDomain()});
+  } catch (error) {
+    next(createError(500, error.message));
+  }
+};

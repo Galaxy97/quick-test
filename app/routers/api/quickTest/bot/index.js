@@ -16,6 +16,10 @@ router.post(
   validator(validSchemes.setResult),
   quickTest.setResult,
 );
+// for test
+router.get('/domain', quickTest.getDomain);
+
+router.post('/domain', quickTest.setDomain);
 
 module.exports = router;
 // const validMesseage = validator(schems.addStudents, data);
