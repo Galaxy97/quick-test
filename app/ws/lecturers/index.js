@@ -34,6 +34,13 @@ class WsLecturers {
                 if (validMSG) throw new Error(validMSG[0].message);
                 quickTest.launchTest(data.code);
                 break;
+              case 'ping':
+                socket.send(
+                  JSON.stringify({
+                    path: 'pong',
+                  }),
+                );
+                break;
               default:
                 throw new Error('path not found');
             }
