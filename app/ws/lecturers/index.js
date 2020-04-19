@@ -3,15 +3,13 @@ const WebSocket = require('ws');
 const url = require('url');
 const querystring = require('querystring');
 
-const config = require('../../config');
-// const services = require('../../services');
 const quickTest = require('../../controllers/quickTest');
 const validator = require('../../utils/socketValidator');
 const schems = require('./validators');
 
 class WsLecturers {
   constructor() {
-    this.wss = new WebSocket.Server({port: config.ws.PORT});
+    this.wss = new WebSocket.Server({noServer: true});
   }
 
   handle() {
