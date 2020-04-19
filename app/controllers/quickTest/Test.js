@@ -127,7 +127,9 @@ async function prepareTest(test, participants) {
       questions,
       participants,
     };
-    handleQuestion(turn[test.id].actual, test.id);
+    setTimeout(() => {
+      handleQuestion(turn[test.id].actual, test.id);
+    }, 5000);
   } catch (error) {
     console.log(error);
   }
@@ -191,6 +193,6 @@ module.exports.launchTest = async code => {
   const msg = {
     participants_id: participants,
   };
-  services.bot.launchTest(msg);
+  await services.bot.launchTest(msg);
   prepareTest(test, participants);
 };
