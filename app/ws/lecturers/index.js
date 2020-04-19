@@ -20,10 +20,9 @@ class WsLecturers {
         const validMesseage = validator(schems.newConnection, query);
         if (validMesseage) throw new Error(validMesseage[0].message);
 
-        console.log('new lecturer', request);
+        console.log('new lecturer');
         quickTest.newLecturerConnection(socket, query);
         socket.on('message', raw => {
-          console.log(raw);
           try {
             const data = JSON.parse(raw);
             if (!data.path) throw new Error('path not found');
