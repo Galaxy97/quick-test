@@ -24,6 +24,14 @@ async function handleQuestion(actualRepeat, id) {
     );
   }
 
+  await (() => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve();
+      }, 5000);
+    });
+  })();
+
   if (actualRepeat < turn[id].attempts) {
     turn[id].questions[actualRepeat].testId = turn[id].test.id;
     const msg = {
@@ -58,9 +66,7 @@ async function handleQuestion(actualRepeat, id) {
         });
         turn[id].actual++;
         turn[id].count = 0;
-        setTimeout(() => {
-          handleQuestion(turn[id].actual, id);
-        }, 5000);
+        handleQuestion(turn[id].actual, id);
       }
     }, 20000); // timeout
   }
@@ -92,13 +98,11 @@ module.exports.setResult = async body => {
     );
 
     const test = await services.quickTest.getTestById(body.test_id);
-    if (turn[test.id].count + 1 === turn[test.id].attempts) {
+    if (turn[test.id].count + 1 === turn[test.id].participants.length) {
       // end question round
       turn[test.id].actual++;
       turn[test.id].count = 0;
-      setTimeout(() => {
-        handleQuestion(turn[test.id].actual, test.id);
-      }, 5000);
+      handleQuestion(turn[test.id].actual, test.id);
     } else turn[test.id].count++;
   } catch (error) {
     console.error(error);
@@ -121,7 +125,7 @@ async function prepareTest(test, participants) {
     // recursion function
     turn[test.id] = {
       count: 0, // must be 0
-      attempts: test.count - 1, // because from 0
+      attempts: test.count,
       actual: 0,
       test,
       questions,
