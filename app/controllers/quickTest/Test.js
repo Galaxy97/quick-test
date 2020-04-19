@@ -121,7 +121,7 @@ async function prepareTest(test, participants) {
     // recursion function
     turn[test.id] = {
       count: 0, // must be 0
-      attempts: test.count, // because from 0
+      attempts: test.count - 1, // because from 0
       actual: 0,
       test,
       questions,
