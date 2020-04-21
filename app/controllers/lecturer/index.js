@@ -15,7 +15,7 @@ module.exports.newLecturer = async (req, res, next) => {
 // eslint-disable-next-line consistent-return
 module.exports.checkLecturer = async (req, res, next) => {
   try {
-    const exsistUUID = await services.checkToken(req.body.uuid);
+    const exsistUUID = await services.checkLecturerToken(req.body.uuid);
     if (!exsistUUID) {
       res.status(400).send('uuid is not exists');
       return false;
