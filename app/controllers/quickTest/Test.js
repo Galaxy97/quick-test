@@ -9,8 +9,8 @@ const turn = {}; // it will be redis ala cache or buffer for all users
 // end bad code
 
 async function handleQuestion(actualRepeat, id) {
+  // if end test
   if (actualRepeat === turn[id].attempts) {
-    // end test
     console.log('end test !!!!');
     const lecturerSocketID = turn[id].test.lecturer_id + turn[id].test.code;
     Lecturer.sendLecturerMesseage(
@@ -23,7 +23,7 @@ async function handleQuestion(actualRepeat, id) {
       }),
     );
   }
-
+  // delay from last question or from start event
   await (() => {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -33,10 +33,21 @@ async function handleQuestion(actualRepeat, id) {
   })();
 
   if (actualRepeat < turn[id].attempts) {
-    turn[id].questions[actualRepeat].testId = turn[id].test.id;
+    // turn[id].questions[actualRepeat].testId = turn[id].test.id;
     const msg = {
       participants_id: turn[id].participants,
-      question: turn[id].questions[actualRepeat],
+      question: {
+        id: turn[id].questions[actualRepeat].id,
+        title: turn[id].questions[actualRepeat].title,
+        subtitle: turn[id].questions[actualRepeat].subtitle,
+        testId: turn[id].test.id,
+        answers: turn[id].questions[actualRepeat].answers.map(element => {
+          return {
+            id: element.id,
+            title: element.title,
+          };
+        }),
+      },
     };
     // send partcicipant question
     await services.bot.sendQuestion(msg);
@@ -122,7 +133,6 @@ async function prepareTest(test, participants) {
     });
 
     const questions = await Promise.all(questionsFunc);
-    // recursion function
     turn[test.id] = {
       count: 0, // must be 0
       attempts: test.count,
@@ -131,11 +141,10 @@ async function prepareTest(test, participants) {
       questions,
       participants,
     };
-    setTimeout(() => {
-      handleQuestion(turn[test.id].actual, test.id);
-    }, 5000);
+    // recursion function
+    handleQuestion(turn[test.id].actual, test.id);
   } catch (error) {
-    console.log(error);
+    console.log(error.message);
   }
 }
 
@@ -154,7 +163,6 @@ module.exports.addStudent = async body => {
   const test = await services.quickTest.checkTestCode(body.code);
   if (!test) {
     throw new Error('this test is not exsist');
-    // next(createError(400, 'this test is not exsist'));
   }
   // find or write data this student
   await services.quickTest.checkStudent(body);

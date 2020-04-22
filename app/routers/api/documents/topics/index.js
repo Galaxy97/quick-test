@@ -4,7 +4,7 @@ const queryValitator = require('../../../../utils/queryValidator');
 const validSchemes = require('./validators');
 const {documents} = require('../../../../controllers');
 const questions = require('../questions');
-const checkId = require('../../../../utils/exsistIdinDB');
+const checkId = require('../../../../utils/exsistInDB');
 
 router.get('/', documents.topics.getAll); // get all courses this user
 
@@ -17,7 +17,12 @@ router.post('/', validator(validSchemes.createTopic), documents.topics.create); 
 router.put(
   '/',
   queryValitator(validSchemes.queryTopicId),
-  checkId('topics', 'id', 'topicId'),
+  checkId([
+    {
+      dbName: 'topics',
+      props: [{tabProp: 'id', reqProp: 'topicId'}],
+    },
+  ]),
   validator(validSchemes.createTopic),
   documents.topics.editById,
 ); // create new couses
@@ -25,7 +30,12 @@ router.put(
 router.delete(
   '/',
   queryValitator(validSchemes.queryTopicId),
-  checkId('topics', 'id', 'topicId'),
+  checkId([
+    {
+      dbName: 'topics',
+      props: [{tabProp: 'id', reqProp: 'topicId'}],
+    },
+  ]),
   documents.topics.deleteById,
 ); // get all courses this user
 
