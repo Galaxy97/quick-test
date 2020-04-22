@@ -34,7 +34,7 @@ module.exports.checkLecturer = async (req, res, next) => {
 module.exports.auth = async (uuid, user) => {
   try {
     // check uuid
-    const exsistUUID = await services.checkLecturerToken(uuid);
+    const exsistUUID = await services.checkToken(uuid);
     if (!exsistUUID) {
       return false;
     }
