@@ -1,9 +1,7 @@
-const Knex = require('knex');
+const knex = require('./knex');
+const redis = require('./redis');
 
-const config = require('../config');
-
-const dbOptions = require('../../knexfile')[config.server.NODE_ENV];
-
-const knex = new Knex(dbOptions);
-
-module.exports = knex;
+module.exports = {
+  knex,
+  redis,
+};

@@ -1,5 +1,5 @@
 const createError = require('http-errors');
-const knex = require('../db');
+const {knex} = require('../db');
 
 // eslint-disable-next-line consistent-return
 module.exports = async (req, res, next) => {

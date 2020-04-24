@@ -5,7 +5,7 @@ const server = require('http').createServer(app);
 
 const Lecturers = require('./ws/lecturers');
 const config = require('./config');
-const knex = require('./db');
+const {knex, redis} = require('./db');
 const authBot = require('./utils/authBot');
 
 server.on('upgrade', function upgrade(request, socket, head) {
@@ -18,6 +18,11 @@ server.on('upgrade', function upgrade(request, socket, head) {
   } else {
     socket.destroy();
   }
+});
+
+redis.on('error', err => {
+  console.log(err.message);
+  process.exit(1);
 });
 
 knex

@@ -7,13 +7,13 @@ services:
       - temp:/var/lib/postgresql/data
     ports:
       - 5420:5432
-  # redis:
-  #   container_name: redis
-  #   image: redis:alpine
-  #   volumes:
-  #     - temp:/var/lib/redis/data
-  #   ports:
-  #     - 6379:6379
+  redis:
+    container_name: redis
+    image: redis:alpine
+    volumes:
+      - temp:/var/lib/redis/data
+    ports:
+      - 6379:6379
 volumes:
   temp:
     driver: local
