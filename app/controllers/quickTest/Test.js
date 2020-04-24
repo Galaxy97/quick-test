@@ -12,16 +12,19 @@ async function handleQuestion(actualRepeat, id) {
   // if end test
   if (actualRepeat === turn[id].attempts) {
     console.log('end test !!!!');
+    const results = await services.quickTest.getResult(id);
     const lecturerSocketID = turn[id].test.lecturer_id + turn[id].test.code;
     Lecturer.sendLecturerMesseage(
       lecturerSocketID,
       JSON.stringify({
         path: 'end_test',
         testId: id,
-        participantsId: [],
-        statistics: 'it will be statistics all results',
+        statistics: results,
       }),
     );
+    await services.bot.sendEndQuestion({
+      participants: turn[id].participants,
+    });
   }
   // delay from last question or from start event
   await (() => {
@@ -33,7 +36,6 @@ async function handleQuestion(actualRepeat, id) {
   })();
 
   if (actualRepeat < turn[id].attempts) {
-    // turn[id].questions[actualRepeat].testId = turn[id].test.id;
     const msg = {
       participants_id: turn[id].participants,
       question: {
@@ -113,6 +115,30 @@ module.exports.setResult = async body => {
       // end question round
       turn[test.id].actual++;
       turn[test.id].count = 0;
+      let results = await services.quickTest.getResult(
+        body.test_id,
+        body.question_id,
+      );
+      results = results.map(res => {
+        const answArr = [];
+        turn[test.id].questions[turn[test.id].actual - 1].answers.forEach(
+          answQuestion => {
+            res.participant_answers.forEach(answ => {
+              if (answ === answQuestion.id) {
+                answArr.push(answQuestion.answer);
+              }
+            });
+          },
+        );
+        return {
+          telegram_id: res.telegram_id,
+          answers: answArr,
+        };
+      });
+      await services.bot.sendResOnQuestion({
+        title: turn[test.id].questions[turn[test.id].actual - 1].title,
+        results,
+      });
       handleQuestion(turn[test.id].actual, test.id);
     } else turn[test.id].count++;
   } catch (error) {

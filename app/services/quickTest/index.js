@@ -198,12 +198,22 @@ module.exports.setResult = async ({
   return false;
 };
 
+module.exports.getResult = async (testId, questionId) => {
+  const sel = {
+    test_id: testId,
+  };
+  if (questionId) sel.question_id = questionId;
+  const records = await dataBase('test_results')
+    .select('telegram_id', 'participant_answers')
+    .where(sel);
+  return records;
+};
+
 module.exports.lookingPartWithOutAnswer = async (
   testId,
   questionId,
   participants,
 ) => {
-  console.log(testId, questionId, participants);
   let partWithAnswer = await dataBase('test_results')
     .select('telegram_id')
     .where({test_id: testId, question_id: questionId});
