@@ -74,7 +74,7 @@ async function handleQuestion(actualRepeat, id) {
         );
         services.bot.partWithoutAnswer({
           testId: id,
-          participants_id: badParticipants,
+          participants: badParticipants,
           questionId: turn[id].questions[actualRepeat].id,
         });
         turn[id].actual++;
@@ -85,6 +85,7 @@ async function handleQuestion(actualRepeat, id) {
   }
 }
 
+// eslint-disable-next-line consistent-return
 module.exports.setResult = async body => {
   try {
     // write in database
@@ -131,7 +132,7 @@ module.exports.setResult = async body => {
           },
         );
         return {
-          telegram_id: res.telegram_id,
+          participants: res.telegram_id,
           answers: answArr,
         };
       });
@@ -144,7 +145,6 @@ module.exports.setResult = async body => {
   } catch (error) {
     console.error(error);
   }
-  return true;
 };
 
 async function prepareTest(test, participants) {
