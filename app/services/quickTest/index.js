@@ -1,4 +1,7 @@
-const dataBase = require('../../db');
+const {promisify} = require('util');
+const {knex, redis} = require('../../db');
+
+const getAsync = promisify(redis.get).bind(redis);
 const config = require('../../config');
 
 const makeCode = () => {
@@ -20,12 +23,12 @@ module.exports.create = async ({lecturerId, questionsId, title}) => {
   do {
     code = makeCode();
     // eslint-disable-next-line no-await-in-loop
-    [check] = await dataBase('tests')
+    [check] = await knex('tests')
       .select('code')
       .where({code});
   } while (check);
   // write test data test
-  const [testId] = await dataBase('tests')
+  const [testId] = await knex('tests')
     .insert({
       lecturer_id: lecturerId,
       title,
@@ -36,18 +39,18 @@ module.exports.create = async ({lecturerId, questionsId, title}) => {
   const tq = questionsId.map(id => {
     return {test_id: testId, question_id: id};
   });
-  await dataBase('test_questions').insert(tq);
+  await knex('test_questions').insert(tq);
 
   if (testId) return code;
   return false;
 };
 
 module.exports.checkTestCode = async code => {
-  const [test] = await dataBase('tests')
+  const [test] = await knex('tests')
     .select(
       'id',
       'title',
-      dataBase.raw('COUNT(test_questions.test_id) :: integer as count'),
+      knex.raw('COUNT(test_questions.test_id) :: integer as count'),
     )
     .innerJoin('test_questions', 'test_questions.test_id', 'tests.id')
     .where({code, is_open: true})
@@ -56,12 +59,12 @@ module.exports.checkTestCode = async code => {
 };
 
 module.exports.getTestByCode = async code => {
-  const [test] = await dataBase('tests')
+  const [test] = await knex('tests')
     .select(
       'id',
       'lecturer_id',
       'code',
-      dataBase.raw('COUNT(test_questions.test_id) :: integer as count'),
+      knex.raw('COUNT(test_questions.test_id) :: integer as count'),
     )
     .innerJoin('test_questions', 'test_questions.test_id', 'tests.id')
     .where({code, is_open: true})
@@ -69,7 +72,7 @@ module.exports.getTestByCode = async code => {
   return test;
 };
 module.exports.getTestById = async id => {
-  const [test] = await dataBase('tests')
+  const [test] = await knex('tests')
     .select()
     .where({id});
   return test;
@@ -77,11 +80,11 @@ module.exports.getTestById = async id => {
 
 module.exports.checkStudent = async student => {
   try {
-    const [participant] = await dataBase('participants')
+    const [participant] = await knex('participants')
       .select('telegram_id')
       .where({telegram_id: student.participant_id});
     if (!participant) {
-      await dataBase('participants').insert({
+      await knex('participants').insert({
         telegram_id: student.participant_id,
         first_name: student.first_name,
         last_name: student.last_name,
@@ -94,12 +97,12 @@ module.exports.checkStudent = async student => {
 
 // eslint-disable-next-line consistent-return
 module.exports.addStudentInTest = async (telegramId, testId) => {
-  const rows = await dataBase('test_participants').where({
+  const rows = await knex('test_participants').where({
     test_id: testId,
     telegram_id: telegramId,
   });
   if (rows.length === 0) {
-    await dataBase('test_participants').insert({
+    await knex('test_participants').insert({
       test_id: testId,
       telegram_id: telegramId,
     });
@@ -107,19 +110,19 @@ module.exports.addStudentInTest = async (telegramId, testId) => {
 };
 
 module.exports.checkSocketId = async (socketId, code) => {
-  const [test] = await dataBase('tests')
+  const [test] = await knex('tests')
     .select('id')
     .where({code});
-  const [socket] = await dataBase('test_lecturers')
+  const [socket] = await knex('test_lecturers')
     .select()
     .where({test_id: test.id});
   if (!socket) {
-    await dataBase('test_lecturers').insert({
+    await knex('test_lecturers').insert({
       test_id: test.id,
       socket_id: socketId,
     });
   } else {
-    await dataBase('test_lecturers')
+    await knex('test_lecturers')
       .update({
         test_id: test.id,
         socket_id: socketId,
@@ -129,7 +132,7 @@ module.exports.checkSocketId = async (socketId, code) => {
 };
 
 module.exports.getLecturerId = async testId => {
-  const [test] = await dataBase('test_lecturers')
+  const [test] = await knex('test_lecturers')
     .select('socket_id')
     .where({test_id: testId});
   return test.socket_id;
@@ -138,7 +141,7 @@ module.exports.getLecturerId = async testId => {
 // eslint-disable-next-line consistent-return
 module.exports.getParticipants = async testId => {
   try {
-    const participants = await dataBase('test_participants')
+    const participants = await knex('test_participants')
       .select('telegram_id')
       .where({test_id: testId});
     const participantsID = [];
@@ -154,7 +157,7 @@ module.exports.getParticipants = async testId => {
 // eslint-disable-next-line consistent-return
 module.exports.closeTest = async testId => {
   try {
-    await dataBase('tests')
+    await knex('tests')
       .update({is_open: false})
       .where({id: testId});
   } catch (error) {
@@ -165,7 +168,7 @@ module.exports.closeTest = async testId => {
 // eslint-disable-next-line consistent-return
 module.exports.getQuestionsId = async testId => {
   try {
-    const ids = await dataBase('test_questions')
+    const ids = await knex('test_questions')
       .select('question_id')
       .where({test_id: testId});
     console.log(ids);
@@ -181,13 +184,13 @@ module.exports.setResult = async ({
   questionId,
   answer,
 }) => {
-  const [record] = await dataBase('test_results').where({
+  const [record] = await knex('test_results').where({
     test_id: testId,
     telegram_id: participantId,
     question_id: questionId,
   });
   if (!record) {
-    await dataBase('test_results').insert({
+    await knex('test_results').insert({
       test_id: testId,
       telegram_id: participantId,
       question_id: questionId,
@@ -198,13 +201,23 @@ module.exports.setResult = async ({
   return false;
 };
 
+module.exports.getResult = async (testId, questionId) => {
+  const sel = {
+    test_id: testId,
+  };
+  if (questionId) sel.question_id = questionId;
+  const records = await knex('test_results')
+    .select('telegram_id', 'participant_answers')
+    .where(sel);
+  return records;
+};
+
 module.exports.lookingPartWithOutAnswer = async (
   testId,
   questionId,
   participants,
 ) => {
-  console.log(testId, questionId, participants);
-  let partWithAnswer = await dataBase('test_results')
+  let partWithAnswer = await knex('test_results')
     .select('telegram_id')
     .where({test_id: testId, question_id: questionId});
   partWithAnswer = partWithAnswer.map(obj => obj.telegram_id);
@@ -215,6 +228,36 @@ module.exports.lookingPartWithOutAnswer = async (
     }
   });
   return withOutAnswer;
+};
+
+module.exports.saveInRedis = async (id, data) => {
+  try {
+    await redis.set(id, JSON.stringify(data));
+  } catch (error) {
+    console.log(error.message);
+    return false;
+  }
+  return true;
+};
+
+module.exports.getFromRedis = async id => {
+  try {
+    let data = await getAsync(id);
+    data = JSON.parse(data);
+    return data;
+  } catch (error) {
+    console.log(error.message);
+    return false;
+  }
+};
+module.exports.deleteFromRedis = async id => {
+  try {
+    await redis.del(id);
+    return true;
+  } catch (error) {
+    console.log(error.message);
+    return false;
+  }
 };
 
 module.exports.setDomain = domain => {

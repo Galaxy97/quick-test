@@ -1,5 +1,5 @@
 const createError = require('http-errors');
-const knex = require('../db');
+const {knex} = require('../db');
 
 module.exports = arr => async (req, res, next) => {
   try {

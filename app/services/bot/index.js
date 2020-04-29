@@ -24,9 +24,31 @@ module.exports.sendQuestion = async msg => {
 module.exports.partWithoutAnswer = async msg => {
   try {
     await axios.post(
+      `${config.telegram.BOT_URL}/quicktest/question/noresult`,
+      msg,
+    );
+    return true;
+  } catch (error) {
+    console.log(error);
+  }
+  return false;
+};
+
+module.exports.sendResOnQuestion = async msg => {
+  try {
+    await axios.post(
       `${config.telegram.BOT_URL}/quicktest/question/result`,
       msg,
     );
+    return true;
+  } catch (error) {
+    console.log(error);
+  }
+  return false;
+};
+module.exports.sendEndQuestion = async msg => {
+  try {
+    await axios.post(`${config.telegram.BOT_URL}/quicktest/question/end`, msg);
     return true;
   } catch (error) {
     console.log(error);
