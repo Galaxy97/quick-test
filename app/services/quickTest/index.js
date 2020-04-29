@@ -1,4 +1,7 @@
-const {knex} = require('../../db');
+const {promisify} = require('util');
+const {knex, redis} = require('../../db');
+
+const getAsync = promisify(redis.get).bind(redis);
 const config = require('../../config');
 
 const makeCode = () => {
@@ -225,6 +228,36 @@ module.exports.lookingPartWithOutAnswer = async (
     }
   });
   return withOutAnswer;
+};
+
+module.exports.saveInRedis = async (id, data) => {
+  try {
+    await redis.set(id, JSON.stringify(data));
+  } catch (error) {
+    console.log(error.message);
+    return false;
+  }
+  return true;
+};
+
+module.exports.getFromRedis = async id => {
+  try {
+    let data = await getAsync(id);
+    data = JSON.parse(data);
+    return data;
+  } catch (error) {
+    console.log(error.message);
+    return false;
+  }
+};
+module.exports.deleteFromRedis = async id => {
+  try {
+    await redis.del(id);
+    return true;
+  } catch (error) {
+    console.log(error.message);
+    return false;
+  }
 };
 
 module.exports.setDomain = domain => {
