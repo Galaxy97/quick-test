@@ -39,6 +39,8 @@ async function handleQuestion(actualRepeat, id) {
 
   if (actualRepeat < testInfo.attempts) {
     const msg = {
+      allQuestions: testInfo.attempts,
+      actualQuestion: actualRepeat + 1,
       participants_id: testInfo.participants,
       question: {
         id: testInfo.questions[actualRepeat].id,
@@ -82,8 +84,10 @@ async function handleQuestion(actualRepeat, id) {
         );
         services.bot.partWithoutAnswer({
           testId: id,
+          testTitle: actualTestInfo.title,
           participants: badParticipants,
           questionId: actualTestInfo.questions[actualRepeat].id,
+          questionTitle: actualTestInfo.questions[actualRepeat].title,
         });
         actualTestInfo.actual++;
         actualTestInfo.count = 0;
@@ -215,7 +219,7 @@ module.exports.addStudent = async body => {
   );
   if (isExsis) {
     return {
-      message: 'this user have added already',
+      message: 'this user has already added',
       participant_id: body.participant_id,
       testTitle: test.title,
       count: test.count,
