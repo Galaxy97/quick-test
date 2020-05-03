@@ -6,26 +6,31 @@ const Lecturer = require('../../ws/lecturers');
 
 // eslint-disable-next-line consistent-return
 async function handleQuestion(actualRepeat, id) {
-  // get tesе info from redis
+  // get test info from redis
   const testInfo = await services.quickTest.getFromRedis(id);
   // if end test
   if (actualRepeat === testInfo.attempts) {
     console.log('end test !!!!');
     const results = await services.quickTest.getResult(id);
+    const statistics = services.quickTest.calculateStatistics(
+      results,
+      testInfo,
+    );
+    console.log(statistics);
     const lecturerSocketID = testInfo.test.lecturer_id + testInfo.test.code;
     Lecturer.sendLecturerMesseage(
       lecturerSocketID,
       JSON.stringify({
         path: 'end_test',
         testId: id,
-        statistics: results,
+        statistics,
       }),
     );
     await services.bot.sendEndQuestion({
       participants: testInfo.participants,
+      statistics: statistics.individual,
     });
     await services.quickTest.deleteFromRedis(id);
-    testInfo.active = false;
     return false;
   }
   // delay from last question or from start event
@@ -70,11 +75,7 @@ async function handleQuestion(actualRepeat, id) {
       // get actual data from redis
       const actualTestInfo = await services.quickTest.getFromRedis(id);
       // get patricipants without response on question
-      if (
-        actualTestInfo &&
-        actualTestInfo.actual === actualRepeat &&
-        actualTestInfo.active
-      ) {
+      if (actualTestInfo && actualTestInfo.actual === actualRepeat) {
         // somb didn't answer
         // looking participants without answer
         const badParticipants = await services.quickTest.lookingPartWithOutAnswer(
@@ -89,6 +90,21 @@ async function handleQuestion(actualRepeat, id) {
           questionId: actualTestInfo.questions[actualRepeat].id,
           questionTitle: actualTestInfo.questions[actualRepeat].title,
         });
+        // set in results without answer
+        const arr = [];
+        badParticipants.forEach(participantId => {
+          arr.push(
+            services.quickTest.setResult({
+              testId: id,
+              participantId,
+              questionId: actualTestInfo.questions[actualRepeat].id,
+              answer: false,
+            }),
+          );
+        });
+
+        await Promise.all(arr);
+
         actualTestInfo.actual++;
         actualTestInfo.count = 0;
         await services.quickTest.saveInRedis(id, actualTestInfo);
@@ -101,6 +117,11 @@ async function handleQuestion(actualRepeat, id) {
 // eslint-disable-next-line consistent-return
 module.exports.setResult = async body => {
   try {
+    // get test info
+    const testInfo = await services.quickTest.getFromRedis(body.test_id);
+    if (!testInfo) {
+      return false; // if testInfo is not exsis => test is not active
+    }
     // write in database
     const record = await services.quickTest.setResult({
       testId: body.test_id,
@@ -110,11 +131,6 @@ module.exports.setResult = async body => {
     });
     if (!record) {
       return false; // do not save
-    }
-    // get test info
-    const testInfo = await services.quickTest.getFromRedis(body.test_id);
-    if (!testInfo) {
-      return false;
     }
     const lecturerSocketID = testInfo.test.lecturer_id + testInfo.test.code;
     Lecturer.sendLecturerMesseage(
@@ -184,7 +200,6 @@ async function prepareTest(test, participants) {
       test,
       questions,
       participants,
-      active: true,
     };
     await services.quickTest.saveInRedis(test.id, testInfo);
     // recursion function

@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 const {promisify} = require('util');
 const {knex, redis} = require('../../db');
 
@@ -207,7 +208,7 @@ module.exports.getResult = async (testId, questionId) => {
   };
   if (questionId) sel.question_id = questionId;
   const records = await knex('test_results')
-    .select('telegram_id', 'participant_answers')
+    .select('telegram_id', 'participant_answers', 'question_id')
     .where(sel);
   return records;
 };
@@ -258,6 +259,111 @@ module.exports.deleteFromRedis = async id => {
     console.log(error.message);
     return false;
   }
+};
+
+function isEqualArrays(a, b) {
+  // if length is not equal
+  if (a.length !== b.length) {
+    return false;
+  }
+  // comapring each element of array
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+}
+
+function sortAndCheckAnswers(data, test) {
+  // write in questions write answers id in array,
+  // right answer can be more than one
+  const questionsAns = {};
+  test.questions.forEach(question => {
+    const rightAnswId = [];
+    question.answers.forEach(answ => {
+      if (answ.answer === true) {
+        rightAnswId.push(answ.id);
+      }
+    });
+    questionsAns[question.id] = {
+      rightAnswId,
+    };
+  });
+  const individuals = {};
+  const questions = {};
+  data.forEach(answer => {
+    let isRight;
+    if (answer.participant_answers === false) isRight = false;
+    else {
+      isRight = isEqualArrays(
+        answer.participant_answers,
+        questionsAns[answer.question_id].rightAnswId,
+      ); // true or false
+    }
+    // write by users answers
+    individuals[answer.telegram_id] = individuals[answer.telegram_id] || [];
+    individuals[answer.telegram_id].push({
+      question_id: answer.question_id,
+      answer: isRight,
+    });
+    // write by questions
+    questions[answer.question_id] = questions[answer.question_id] || [];
+    questions[answer.question_id].push({
+      telegram_id: answer.telegram_id,
+      answer: isRight,
+    });
+  });
+  return {
+    individuals,
+    questions,
+  };
+}
+
+module.exports.calculateStatistics = (data, test) => {
+  const answers = sortAndCheckAnswers(data, test); // individuals and questions
+
+  Object.keys(answers.individuals).forEach(participantId => {
+    let trueAnsw = 0;
+    answers.individuals[participantId].forEach(question => {
+      if (question.answer) trueAnsw++;
+    });
+    answers.individuals[participantId] = {
+      all: answers.individuals[participantId].length,
+      true: trueAnsw,
+      false: answers.individuals[participantId].length - trueAnsw,
+      percent:
+        Math.round(trueAnsw / answers.individuals[participantId].length) * 100,
+    };
+  });
+
+  Object.keys(answers.questions).forEach(questionId => {
+    let trueAnsw = 0;
+    answers.questions[questionId].forEach(user => {
+      if (user.answer) trueAnsw++;
+    });
+    answers.questions[questionId] = {
+      all: test.participants.length,
+      true: trueAnsw,
+      false: test.participants.length - trueAnsw,
+      percent: Math.round(trueAnsw / test.participants.length) * 100,
+    };
+  });
+  let all = 0;
+  let trueAnsw = 0;
+  Object.keys(answers.questions).forEach(questionId => {
+    all += answers.questions[questionId].all;
+    trueAnsw += answers.questions[questionId].true;
+  });
+
+  return {
+    common: {
+      allQuestions: all,
+      trueAnsw,
+      percent: Math.round(trueAnsw / all) * 100,
+    },
+    individual: answers.individuals,
+    questions: answers.questions,
+  };
 };
 
 module.exports.setDomain = domain => {
