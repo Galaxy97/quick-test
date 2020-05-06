@@ -65,6 +65,7 @@ module.exports.getTestByCode = async code => {
       'id',
       'lecturer_id',
       'code',
+      'title',
       knex.raw('COUNT(test_questions.test_id) :: integer as count'),
     )
     .innerJoin('test_questions', 'test_questions.test_id', 'tests.id')
@@ -331,8 +332,9 @@ module.exports.calculateStatistics = (data, test) => {
       all: answers.individuals[participantId].length,
       true: trueAnsw,
       false: answers.individuals[participantId].length - trueAnsw,
-      percent:
-        Math.round(trueAnsw / answers.individuals[participantId].length) * 100,
+      percent: Math.round(
+        (trueAnsw / answers.individuals[participantId].length) * 100,
+      ),
     };
   });
 
@@ -345,7 +347,7 @@ module.exports.calculateStatistics = (data, test) => {
       all: test.participants.length,
       true: trueAnsw,
       false: test.participants.length - trueAnsw,
-      percent: Math.round(trueAnsw / test.participants.length) * 100,
+      percent: Math.round((trueAnsw / test.participants.length) * 100),
     };
   });
   let all = 0;
@@ -359,7 +361,7 @@ module.exports.calculateStatistics = (data, test) => {
     common: {
       allQuestions: all,
       trueAnsw,
-      percent: Math.round(trueAnsw / all) * 100,
+      percent: Math.round((trueAnsw / all) * 100),
     },
     individual: answers.individuals,
     questions: answers.questions,

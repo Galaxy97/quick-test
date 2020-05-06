@@ -54,7 +54,7 @@ module.exports.launchTest = code => {
 
 module.exports.setResult = async (req, res, next) => {
   try {
-    Test.setResult(req.body);
+    await Test.setResult(req.body);
     res.json({message: 'successful saved'});
   } catch (error) {
     next(createError(500, error.message));
