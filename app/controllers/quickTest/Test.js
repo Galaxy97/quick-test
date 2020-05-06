@@ -44,10 +44,10 @@ async function handleQuestion(actualRepeat, id) {
 
   if (actualRepeat < testInfo.attempts) {
     const msg = {
-      allQuestions: testInfo.attempts,
-      actualQuestion: actualRepeat + 1,
       participants_id: testInfo.participants,
       question: {
+        allQuestions: testInfo.attempts,
+        actualQuestion: actualRepeat + 1,
         id: testInfo.questions[actualRepeat].id,
         title: testInfo.questions[actualRepeat].title,
         subtitle: testInfo.questions[actualRepeat].subtitle,
@@ -68,7 +68,15 @@ async function handleQuestion(actualRepeat, id) {
       lecturerSocketID,
       JSON.stringify({
         path: 'question',
-        question: testInfo.questions[actualRepeat],
+        question: {
+          allQuestions: testInfo.attempts,
+          actualQuestion: actualRepeat + 1,
+          id: testInfo.questions[actualRepeat].id,
+          title: testInfo.questions[actualRepeat].title,
+          subtitle: testInfo.questions[actualRepeat].subtitle,
+          testId: testInfo.test.id,
+          answers: testInfo.questions[actualRepeat].answers,
+        },
       }),
     );
     setTimeout(async () => {
@@ -83,13 +91,39 @@ async function handleQuestion(actualRepeat, id) {
           actualTestInfo.questions[actualRepeat].id,
           actualTestInfo.participants,
         );
-        services.bot.partWithoutAnswer({
+        await services.bot.partWithoutAnswer({
           testId: id,
-          testTitle: actualTestInfo.title,
+          testTitle: actualTestInfo.test.title,
           participants: badParticipants,
           questionId: actualTestInfo.questions[actualRepeat].id,
           questionTitle: actualTestInfo.questions[actualRepeat].title,
         });
+        // calculate who has sent answer
+        let results = await services.quickTest.getResult(
+          id,
+          actualTestInfo.questions[actualRepeat].id,
+        );
+        results = results.map(res => {
+          const answArr = [];
+          actualTestInfo.questions[actualTestInfo.actual].answers.forEach(
+            answQuestion => {
+              res.participant_answers.forEach(answ => {
+                if (answ === answQuestion.id) {
+                  answArr.push(answQuestion.answer);
+                }
+              });
+            },
+          );
+          return {
+            participants: res.telegram_id,
+            answers: answArr,
+          };
+        });
+        await services.bot.sendResOnQuestion({
+          title: actualTestInfo.questions[actualTestInfo.actual].title,
+          results,
+        });
+        //
         // set in results without answer
         const arr = [];
         badParticipants.forEach(participantId => {
@@ -146,36 +180,41 @@ module.exports.setResult = async body => {
 
     const test = await services.quickTest.getTestById(body.test_id);
     if (testInfo.count + 1 === testInfo.participants.length) {
-      // end question round
-      testInfo.actual++;
-      testInfo.count = 0;
-      let results = await services.quickTest.getResult(
-        body.test_id,
-        body.question_id,
-      );
-      results = results.map(res => {
-        const answArr = [];
-        testInfo.questions[testInfo.actual - 1].answers.forEach(
-          answQuestion => {
-            res.participant_answers.forEach(answ => {
-              if (answ === answQuestion.id) {
-                answArr.push(answQuestion.answer);
-              }
-            });
-          },
+      setTimeout(async () => {
+        // end question round
+        testInfo.actual++;
+        testInfo.count = 0;
+        let results = await services.quickTest.getResult(
+          body.test_id,
+          body.question_id,
         );
-        return {
-          participants: res.telegram_id,
-          answers: answArr,
-        };
+        results = results.map(res => {
+          const answArr = [];
+          testInfo.questions[testInfo.actual - 1].answers.forEach(
+            answQuestion => {
+              res.participant_answers.forEach(answ => {
+                if (answ === answQuestion.id) {
+                  answArr.push(answQuestion.answer);
+                }
+              });
+            },
+          );
+          return {
+            participants: res.telegram_id,
+            answers: answArr,
+          };
+        });
+        await services.bot.sendResOnQuestion({
+          title: testInfo.questions[testInfo.actual - 1].title,
+          results,
+        });
+        handleQuestion(testInfo.actual, test.id);
+        await services.quickTest.saveInRedis(test.id, testInfo);
       });
-      await services.bot.sendResOnQuestion({
-        title: testInfo.questions[testInfo.actual - 1].title,
-        results,
-      });
-      handleQuestion(testInfo.actual, test.id);
-    } else testInfo.count++;
-    await services.quickTest.saveInRedis(test.id, testInfo);
+    } else {
+      testInfo.count++;
+      await services.quickTest.saveInRedis(test.id, testInfo);
+    }
   } catch (error) {
     console.error(error);
   }
