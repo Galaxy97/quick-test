@@ -1,9 +1,9 @@
 const router = require('express').Router();
-const documents = require('../../../../controllers/documents');
+const {questions} = require('../../../../controllers/documents');
 
 const multi = require('./multiChoice');
 
-router.get('/', documents.questions.getAll);
+router.get('/', questions.getAll);
 
 router.use('/multichoice', multi);
 

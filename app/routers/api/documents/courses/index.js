@@ -2,31 +2,29 @@ const router = require('express').Router();
 const validator = require('../../../../utils/validator');
 const queryValitator = require('../../../../utils/queryValidator');
 const validSchemes = require('./validators');
-const {documents} = require('../../../../controllers');
-const subjects = require('../subjetcs');
+const {courses} = require('../../../../controllers/documents');
+const subjects = require('../subjetcs'); // routes for subject in courses
 
-router.get('/', documents.courses.getAll); // get all courses this user
-// router.get('/courses/:id', checkUser, documents.courses.getbyId); // get all courses this user
+// get all courses this user
+router.get('/', courses.getAll);
 
-router.post(
-  '/',
-  validator(validSchemes.createCourse),
-  documents.courses.create,
-); // create new couses
+// create new couses
+router.post('/', validator(validSchemes.createCourse), courses.create);
 
+// edit couses by id
 router.put(
   '/',
-  queryValitator(validSchemes.queryCourseId),
+  queryValitator(validSchemes.queryCourseId), // request must have course_id
   validator(validSchemes.createCourse),
-  documents.courses.editById,
-); // edit couses by id
+  courses.editById,
+);
 
-// router.delete('/courses', checkUser, documents.courses.deleteAll); // delete all couses
+// delete courses by id
 router.delete(
   '/',
-  queryValitator(validSchemes.queryCourseId),
-  documents.courses.deleteById,
-); // delete courses by id
+  queryValitator(validSchemes.queryCourseId), // request must have course_id
+  courses.deleteById,
+);
 
 router.use('/subjects', queryValitator(validSchemes.queryCourseId), subjects); // handle subjects valid in the next handle
 

@@ -2,42 +2,32 @@ const router = require('express').Router();
 const validator = require('../../../../utils/validator');
 const queryValitator = require('../../../../utils/queryValidator');
 const validSchemes = require('./validators');
-const {documents} = require('../../../../controllers');
+const {topics} = require('../../../../controllers/documents');
 const questions = require('../questions');
 const checkId = require('../../../../utils/exsistInDB');
 
-router.get('/', documents.topics.getAll); // get all courses this user
+// get all topics
+router.get('/', topics.getAll);
 
-// router.get('/:id', (req, res) => {
-//   res.send(`get ${req.params.id} subjects from ${req.coursesID}`);
-// }); // get all courses this user
+// create new topic
+router.post('/', validator(validSchemes.createTopic), topics.create);
 
-router.post('/', validator(validSchemes.createTopic), documents.topics.create); // create new topic
-
+// update topic by id
 router.put(
   '/',
-  queryValitator(validSchemes.queryTopicId),
-  checkId([
-    {
-      dbName: 'topics',
-      props: [{tabProp: 'id', reqProp: 'topicId'}],
-    },
-  ]),
+  queryValitator(validSchemes.queryTopicId), // check if request have id
+  checkId(validSchemes.schemeCheckId), // check if this id exists in db
   validator(validSchemes.createTopic),
-  documents.topics.editById,
-); // create new couses
+  topics.editById,
+);
 
+// delete topic by id
 router.delete(
   '/',
-  queryValitator(validSchemes.queryTopicId),
-  checkId([
-    {
-      dbName: 'topics',
-      props: [{tabProp: 'id', reqProp: 'topicId'}],
-    },
-  ]),
-  documents.topics.deleteById,
-); // get all courses this user
+  queryValitator(validSchemes.queryTopicId), // check if request have id
+  checkId(validSchemes.schemeCheckId), // check if this id exists in db
+  topics.deleteById,
+);
 
 router.use('/questions', queryValitator(validSchemes.queryTopicId), questions);
 
