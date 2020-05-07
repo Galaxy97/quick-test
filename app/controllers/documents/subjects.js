@@ -1,12 +1,13 @@
 const createError = require('http-errors');
 const services = require('../../services');
 
+// get all subjects in course
 module.exports.getAll = async (req, res, next) => {
   try {
     const subject = await services.documents.subjects.getAll(
       Number(req.query.courseId),
     );
-    res.send({subject});
+    res.json({subject});
   } catch (error) {
     next(createError(500, error.message));
   }
@@ -18,7 +19,7 @@ module.exports.create = async (req, res, next) => {
       Number(req.query.courseId),
       req.body,
     );
-    res.json({id: subject});
+    res.json({message: 'successful create', id: subject});
   } catch (error) {
     next(createError(500, error.message));
   }
@@ -31,7 +32,7 @@ module.exports.editById = async (req, res, next) => {
       Number(req.query.subjectId),
       req.body,
     );
-    if (subject) res.json({id: subject});
+    if (subject) res.json({message: 'successful update', id: subject});
     else next(createError(400, 'Bad request'));
   } catch (error) {
     next(createError(500, error.message));

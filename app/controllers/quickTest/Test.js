@@ -281,6 +281,7 @@ module.exports.addStudent = async body => {
   }
   const send = {
     path: 'newStudent',
+    participantId: body.participant_id,
     firstName: body.first_name,
     lastName: body.last_name,
   };
