@@ -3,7 +3,7 @@ const {knex} = require('../db');
 
 module.exports = arr => async (req, res, next) => {
   try {
-    const promArr = [];
+    const promArr = []; // array for promise all
     arr.forEach(obj => {
       const where = {};
       obj.props.forEach(prop => {
