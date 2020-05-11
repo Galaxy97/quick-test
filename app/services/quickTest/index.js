@@ -42,7 +42,7 @@ module.exports.create = async ({lecturerId, questionsId, title}) => {
   });
   await knex('test_questions').insert(tq);
 
-  if (testId) return code;
+  if (testId) return {code, id: testId};
   return false;
 };
 

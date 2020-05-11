@@ -2,7 +2,7 @@
 
 const createError = require('http-errors');
 const services = require('../../services');
-const Test = require('./Test');
+const Test = require('./test');
 
 module.exports.createTest = async (req, res, next) => {
   try {
@@ -28,14 +28,19 @@ module.exports.addStudent = async (req, res, next) => {
   }
 };
 
-module.exports.newLecturerConnection = async (socket, headers) => {
+module.exports.newLecturerConnection = async (socket, headers, wss) => {
   try {
     // get lecturer id by token
     const lecturer = await services.lecturer.checkLecturerToken(headers.token); // lecturer.id
     // create socketId
     const socketId = lecturer.id + headers.code;
+    // delete old clients with this id
+    wss.clients.forEach(client => {
+      if (client.id === socketId) {
+        client.terminate(); // close connection
+      }
+    });
     // check if socketId is exsist
-    // socketId == socket_lecturer_id
     await services.quickTest.checkSocketId(socketId, headers.code);
     // assign socketid to socket
     socket.id = socketId;
