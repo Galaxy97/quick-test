@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-constructor */
 const WebSocket = require('ws');
 const url = require('url');
 const querystring = require('querystring');
@@ -21,7 +20,7 @@ class WsLecturers {
         if (validMesseage) throw new Error(validMesseage[0].message);
 
         console.log('new lecturer');
-        quickTest.newLecturerConnection(socket, query);
+        quickTest.newLecturerConnection(socket, query, this.wss);
         socket.on('message', raw => {
           try {
             const data = JSON.parse(raw);
@@ -30,7 +29,7 @@ class WsLecturers {
               case 'launch_test':
                 // eslint-disable-next-line no-case-declarations
                 const validMSG = validator(schems.launchTest, data);
-                if (validMSG) throw new Error(validMSG[0].message);
+                if (validMSG) throw new Error(validMSG.message);
                 quickTest.launchTest(data.code);
                 break;
               case 'ping':
@@ -46,6 +45,7 @@ class WsLecturers {
           } catch (error) {
             socket.send(
               JSON.stringify({
+                path: 'error',
                 messeage: String(error),
               }),
             );
@@ -54,6 +54,7 @@ class WsLecturers {
       } catch (error) {
         socket.send(
           JSON.stringify({
+            path: 'error',
             messeage: String(error),
           }),
         );

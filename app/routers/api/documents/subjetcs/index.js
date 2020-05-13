@@ -1,48 +1,34 @@
 const router = require('express').Router();
 const validator = require('../../../../utils/validator');
 const queryValitator = require('../../../../utils/queryValidator');
-const validSchemes = require('./validators');
-const {documents} = require('../../../../controllers');
-const topics = require('../topics');
 const checkId = require('../../../../utils/exsistInDB');
+const validSchemes = require('./validators');
+const {subjects} = require('../../../../controllers/documents');
+const topics = require('../topics');
 
-router.get('/', documents.subjects.getAll); // get all courses this user
+// get all subjetcs in course
+router.get('/', subjects.getAll);
 
-// router.get('/:id', (req, res) => {
-//   res.send(`get ${req.params.id} subjects from ${req.coursesID}`);
-// }); // get all courses this user
+// create new subjetcs
+router.post('/', validator(validSchemes.createSubject), subjects.create);
 
-router.post(
-  '/',
-  validator(validSchemes.createSubject),
-  documents.subjects.create,
-); // create new couses
-
+// update subjetcs by id
 router.put(
   '/',
-  queryValitator(validSchemes.querySubjectId),
-  checkId([
-    {
-      dbName: 'subjects',
-      props: [{tabProp: 'id', reqProp: 'subjectId'}],
-    },
-  ]),
+  queryValitator(validSchemes.querySubjectId), // check if request have id
+  checkId(validSchemes.schemeCheckId), // check if this id exists in db
   validator(validSchemes.createSubject),
-  documents.subjects.editById,
-); // create new couses
+  subjects.editById,
+);
 
+// delete subjetcs by id
 router.delete(
   '/',
-  queryValitator(validSchemes.querySubjectId),
-  checkId([
-    {
-      dbName: 'subjects',
-      props: [{tabProp: 'id', reqProp: 'subjectId'}],
-    },
-  ]),
-  documents.subjects.deleteById,
-); // get all courses this user
+  queryValitator(validSchemes.querySubjectId), // check if request have id
+  checkId(validSchemes.schemeCheckId), // check if this id exists in db
+  subjects.deleteById,
+);
 
-router.use('/topics', queryValitator(validSchemes.querySubjectId), topics);
+router.use('/topics', queryValitator(validSchemes.querySubjectId), topics); // topics in subject
 
 module.exports = router;

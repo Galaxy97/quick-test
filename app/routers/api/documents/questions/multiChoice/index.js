@@ -5,41 +5,31 @@ const validSchemes = require('./validators');
 const {documents} = require('../../../../../controllers');
 const checkId = require('../../../../../utils/exsistInDB');
 
-router.get('/', documents.questions.multiChoice.getAll); // get all courses this user
+// get all multi question
+router.get('/', documents.questions.multiChoice.getAll);
 
-// router.get('/:id', (req, res) => {
-//   res.send(`get ${req.params.id} subjects from ${req.coursesID}`);
-// }); // get all courses this user
-
+// create multi question
 router.post(
   '/',
   validator(validSchemes.multiCreate),
   documents.questions.multiChoice.create,
-); // create new topic
+);
 
+// update multi question by id
 router.put(
   '/',
-  queryValitator(validSchemes.queryQuestionId),
-  checkId([
-    {
-      dbName: 'multi_choice',
-      props: [{tabProp: 'id', reqProp: 'questionId'}],
-    },
-  ]),
+  queryValitator(validSchemes.queryQuestionId), // check if request have id
+  checkId(validSchemes.schemeCheckId), // check if this id exists in db
   validator(validSchemes.multiCreate),
   documents.questions.multiChoice.editById,
-); // create new couses
+);
 
+// delete multi question by id
 router.delete(
   '/',
-  queryValitator(validSchemes.queryQuestionId),
-  checkId([
-    {
-      dbName: 'multi_choice',
-      props: [{tabProp: 'id', reqProp: 'questionId'}],
-    },
-  ]),
+  queryValitator(validSchemes.queryQuestionId), // check if request have id
+  checkId(validSchemes.schemeCheckId), // check if this id exists in db
   documents.questions.multiChoice.deleteById,
-); // get all courses this user
+);
 
 module.exports = router;

@@ -7,28 +7,27 @@ module.exports.newLecturer = async (req, res, next) => {
     const token = await services.newLecturer();
     res.json({token});
   } catch (error) {
-    console.log(error.message);
     next(createError(500, error.message));
   }
 };
 
-// eslint-disable-next-line consistent-return
 module.exports.checkLecturer = async (req, res, next) => {
   try {
     const exsistUUID = await services.checkLecturerToken(req.body.uuid);
     if (!exsistUUID) {
-      res.status(400).send('uuid is not exists');
+      res.status(400).json({message: 'uuid is not exists'});
       return false;
     }
     const lecturer = await services.getByToken(req.body.uuid);
     if (!lecturer) {
-      res.status(400).send('lecturer is not valid');
+      res.status(400).json({message: 'lecturer is not valid'});
       return false;
     }
     res.json({message: 'valid', lecturer});
   } catch (error) {
     next(createError(500, error.message));
   }
+  return true; // for eslint rull
 };
 
 module.exports.auth = async (uuid, user) => {
@@ -49,7 +48,6 @@ module.exports.auth = async (uuid, user) => {
     await services.registr(uuid, user);
     return true;
   } catch (error) {
-    // console.log(error.message);
     return false;
   }
 };

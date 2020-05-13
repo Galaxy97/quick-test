@@ -42,7 +42,7 @@ module.exports.create = async ({lecturerId, questionsId, title}) => {
   });
   await knex('test_questions').insert(tq);
 
-  if (testId) return code;
+  if (testId) return {code, id: testId};
   return false;
 };
 
@@ -322,20 +322,22 @@ function sortAndCheckAnswers(data, test) {
 
 module.exports.calculateStatistics = (data, test) => {
   const answers = sortAndCheckAnswers(data, test); // individuals and questions
-
+  answers.individualsArr = []; // array for mobile app
+  answers.questionsArr = [];
   Object.keys(answers.individuals).forEach(participantId => {
     let trueAnsw = 0;
     answers.individuals[participantId].forEach(question => {
       if (question.answer) trueAnsw++;
     });
-    answers.individuals[participantId] = {
+    answers.individualsArr.push({
+      participantId,
       all: answers.individuals[participantId].length,
       true: trueAnsw,
       false: answers.individuals[participantId].length - trueAnsw,
       percent: Math.round(
         (trueAnsw / answers.individuals[participantId].length) * 100,
       ),
-    };
+    });
   });
 
   Object.keys(answers.questions).forEach(questionId => {
@@ -343,12 +345,13 @@ module.exports.calculateStatistics = (data, test) => {
     answers.questions[questionId].forEach(user => {
       if (user.answer) trueAnsw++;
     });
-    answers.questions[questionId] = {
+    answers.questionsArr.push({
+      questionId,
       all: test.participants.length,
       true: trueAnsw,
       false: test.participants.length - trueAnsw,
       percent: Math.round((trueAnsw / test.participants.length) * 100),
-    };
+    });
   });
   let all = 0;
   let trueAnsw = 0;
@@ -364,7 +367,9 @@ module.exports.calculateStatistics = (data, test) => {
       percent: Math.round((trueAnsw / all) * 100),
     },
     individual: answers.individuals,
+    individualArr: answers.individualsArr,
     questions: answers.questions,
+    questionsArr: answers.questionsArr,
   };
 };
 

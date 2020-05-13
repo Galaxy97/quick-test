@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const checkUser = require('../../utils/checkUser');
+const checkUser = require('../../utils/checkUser'); // middleware whether user exists in db
 const lecturer = require('./lecturer');
 const documents = require('./documents');
 const quickTest = require('./quickTest');
