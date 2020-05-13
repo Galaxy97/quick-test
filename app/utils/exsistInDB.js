@@ -7,7 +7,7 @@ module.exports = arr => async (req, res, next) => {
     arr.forEach(obj => {
       const where = {};
       obj.props.forEach(prop => {
-        where[prop.tabProp] = req.query[prop.reqProp];
+        where[prop.tabProp] = req.body[prop.reqProp];
       });
       promArr.push(
         knex
