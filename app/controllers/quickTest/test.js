@@ -6,90 +6,6 @@ const services = require('../../services');
 const Lecturer = require('../../ws/lecturers');
 const delay = require('../../utils/delay');
 
-async function prepareQuestion(actualRepeat, test) {
-  const msg = {
-    participants_id: test.participants,
-    question: {
-      allQuestions: test.attempts,
-      actualQuestion: actualRepeat + 1,
-      id: test.questions[actualRepeat].id,
-      title: test.questions[actualRepeat].title,
-      subtitle: test.questions[actualRepeat].subtitle,
-      timeout: 20,
-      testId: test.id,
-      answers: test.questions[actualRepeat].answers.map(element => {
-        return {
-          // id and title answer
-          id: element.id,
-          title: element.title,
-        };
-      }),
-    },
-  };
-  // send partcicipant question
-  await services.bot.sendQuestion(msg);
-  const lecturerSocketID = test.lecturerId + test.code;
-
-  Lecturer.sendLecturerMesseage(
-    lecturerSocketID,
-    JSON.stringify({
-      path: 'question',
-      question: {
-        allQuestions: test.attempts,
-        actualQuestion: actualRepeat + 1,
-        id: test.questions[actualRepeat].id,
-        title: test.questions[actualRepeat].title,
-        subtitle: test.questions[actualRepeat].subtitle,
-        testId: test.id,
-        timeout: 20,
-        answers: test.questions[actualRepeat].answers,
-      },
-    }),
-  );
-  delay(20000).then(async () => {
-    // get actual data from redis
-    const actualTestInfo = await services.quickTest.getFromRedis(test.id);
-    // get patricipants without response on question
-    if (actualTestInfo && actualTestInfo.actual === actualRepeat) {
-      timeoutFunc(actualTestInfo);
-    }
-  });
-}
-
-// eslint-disable-next-line consistent-return
-async function handleQuestion(actualRepeat, id) {
-  // get test info from redis
-  const test = await services.quickTest.getFromRedis(id);
-  // if end test
-  if (actualRepeat === test.attempts) {
-    console.log('end test !!!!');
-    // end test
-    const results = await services.quickTest.getResult(id);
-    const statistics = services.quickTest.calculateStatistics(results, test);
-    const lecturerSocketID = test.lecturerId + test.code;
-    Lecturer.sendLecturerMesseage(
-      lecturerSocketID,
-      JSON.stringify({
-        path: 'end_test',
-        testId: id,
-        statistics,
-      }),
-    );
-    await services.bot.sendEndQuestion({
-      participants: test.participants,
-      statistics: statistics.individual,
-    });
-    await services.quickTest.deleteFromRedis(id);
-    return false;
-  }
-  // delay from last question or from start event
-  await delay(5000);
-
-  if (actualRepeat < test.attempts) {
-    prepareQuestion(actualRepeat, test);
-  }
-}
-
 async function getResults(test) {
   let results = await services.quickTest.getResult(
     test.id,
@@ -214,6 +130,94 @@ module.exports.setResult = async body => {
   }
 };
 
+async function prepareQuestion(actualRepeat, test) {
+  const msg = {
+    participants_id: test.participants,
+    question: {
+      allQuestions: test.attempts,
+      actualQuestion: actualRepeat + 1,
+      id: test.questions[actualRepeat].id,
+      title: test.questions[actualRepeat].title,
+      subtitle: test.questions[actualRepeat].subtitle,
+      timeout: 20,
+      testId: test.id,
+      answers: test.questions[actualRepeat].answers.map(element => {
+        return {
+          // id and title answer
+          id: element.id,
+          title: element.title,
+        };
+      }),
+    },
+  };
+  // send partcicipant question
+  await services.bot.sendQuestion(msg);
+  const lecturerSocketID = test.lecturerId + test.code;
+
+  Lecturer.sendLecturerMesseage(
+    lecturerSocketID,
+    JSON.stringify({
+      path: 'question',
+      question: {
+        allQuestions: test.attempts,
+        actualQuestion: actualRepeat + 1,
+        id: test.questions[actualRepeat].id,
+        title: test.questions[actualRepeat].title,
+        subtitle: test.questions[actualRepeat].subtitle,
+        testId: test.id,
+        timeout: 20,
+        answers: test.questions[actualRepeat].answers,
+      },
+    }),
+  );
+  delay(20000).then(async () => {
+    // get actual data from redis
+    const actualTestInfo = await services.quickTest.getFromRedis(test.id);
+    // get patricipants without response on question
+    if (actualTestInfo && actualTestInfo.actual === actualRepeat) {
+      timeoutFunc(actualTestInfo);
+    }
+  });
+}
+
+// eslint-disable-next-line consistent-return
+async function handleQuestion(actualRepeat, id) {
+  // get test info from redis
+  const test = await services.quickTest.getFromRedis(id);
+  // if end test
+  if (actualRepeat === test.attempts) {
+    console.log('end test !!!!');
+    // end test
+    const results = await services.quickTest.getResult(id);
+    const statistics = services.quickTest.calculateStatistics(results, test);
+    const lecturerSocketID = test.lecturerId + test.code;
+    Lecturer.sendLecturerMesseage(
+      lecturerSocketID,
+      JSON.stringify({
+        path: 'end_test',
+        testId: id,
+        statistics: {
+          common: statistics.common,
+          individual: statistics.individualArr,
+          questions: statistics.questionsArr,
+        },
+      }),
+    );
+    await services.bot.sendEndQuestion({
+      participants: test.participants,
+      statistics: statistics.individual,
+    });
+    await services.quickTest.deleteFromRedis(id);
+    return false;
+  }
+  // delay from last question or from start event
+  await delay(5000);
+
+  if (actualRepeat < test.attempts) {
+    prepareQuestion(actualRepeat, test);
+  }
+}
+
 module.exports.launchTest = async code => {
   // get test id by code
   // check code
@@ -256,7 +260,7 @@ module.exports.addStudent = async body => {
       message: 'this user has already added',
       participant_id: body.participant_id,
       testTitle: test.title,
-      count: test.count,
+      count: test.attempts,
     };
   }
   // send message to lecturer
@@ -273,7 +277,7 @@ module.exports.addStudent = async body => {
   return {
     participant_id: body.participant_id,
     testTitle: test.title,
-    count: test.count,
+    count: test.attempts,
   };
 };
 
@@ -284,6 +288,7 @@ module.exports.create = async ({lecturerId, questionsId, title}) => {
     questionsId,
     title,
   });
+
   test.attempts = questionsId.length;
   test.questionsId = questionsId;
   test.title = title;
