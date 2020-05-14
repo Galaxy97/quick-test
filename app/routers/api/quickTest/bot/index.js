@@ -33,9 +33,5 @@ router.post(
   validator(validSchemes.setResult),
   quickTest.setResult,
 );
-// for test set and get domain Telegram server on Test server
-router.get('/domain', quickTest.getDomain);
-
-router.post('/domain', quickTest.setDomain);
 
 module.exports = router;
