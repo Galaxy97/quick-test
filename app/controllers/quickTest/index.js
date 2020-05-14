@@ -13,7 +13,6 @@ module.exports.createTest = async (req, res, next) => {
     });
     res.json({code});
   } catch (error) {
-    console.log(error.message);
     next(createError(500, error.message));
   }
 };
@@ -45,7 +44,7 @@ module.exports.newLecturerConnection = async (socket, headers, wss) => {
     // assign socketid to socket
     socket.id = socketId;
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
 };
 
@@ -53,7 +52,7 @@ module.exports.launchTest = code => {
   try {
     Test.launchTest(code);
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
   }
 };
 
@@ -61,23 +60,6 @@ module.exports.setResult = async (req, res, next) => {
   try {
     await Test.setResult(req.body);
     res.json({message: 'successful saved'});
-  } catch (error) {
-    next(createError(500, error.message));
-  }
-};
-
-module.exports.setDomain = async (req, res, next) => {
-  try {
-    services.quickTest.setDomain(req.body.domain);
-    res.json({message: 'successful saved'});
-  } catch (error) {
-    next(createError(500, error.message));
-  }
-};
-
-module.exports.getDomain = async (req, res, next) => {
-  try {
-    res.json({message: services.quickTest.getDomain()});
   } catch (error) {
     next(createError(500, error.message));
   }

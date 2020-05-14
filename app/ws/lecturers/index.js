@@ -19,7 +19,6 @@ class WsLecturers {
         const validMesseage = validator(schems.newConnection, query);
         if (validMesseage) throw new Error(validMesseage[0].message);
 
-        console.log('new lecturer');
         quickTest.newLecturerConnection(socket, query, this.wss);
         socket.on('message', raw => {
           try {

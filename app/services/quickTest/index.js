@@ -93,7 +93,7 @@ module.exports.checkStudent = async student => {
       });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
 };
 
@@ -152,7 +152,7 @@ module.exports.getParticipants = async testId => {
     });
     return participantsID;
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
 };
 
@@ -163,7 +163,7 @@ module.exports.closeTest = async testId => {
       .update({is_open: false})
       .where({id: testId});
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
 };
 
@@ -173,10 +173,9 @@ module.exports.getQuestionsId = async testId => {
     const ids = await knex('test_questions')
       .select('question_id')
       .where({test_id: testId});
-    console.log(ids);
     return ids;
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
 };
 
@@ -236,7 +235,7 @@ module.exports.saveInRedis = async (id, data) => {
   try {
     await redis.set(id, JSON.stringify(data));
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     return false;
   }
   return true;
@@ -248,7 +247,7 @@ module.exports.getFromRedis = async id => {
     data = JSON.parse(data);
     return data;
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     return false;
   }
 };
@@ -257,7 +256,7 @@ module.exports.deleteFromRedis = async id => {
     await redis.del(id);
     return true;
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     return false;
   }
 };
@@ -371,13 +370,4 @@ module.exports.calculateStatistics = (data, test) => {
     questions: answers.questions,
     questionsArr: answers.questionsArr,
   };
-};
-
-module.exports.setDomain = domain => {
-  config.telegram.BOT_URL = domain;
-  return true;
-};
-
-module.exports.getDomain = () => {
-  return config.telegram.BOT_URL;
 };

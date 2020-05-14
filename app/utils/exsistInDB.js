@@ -23,7 +23,6 @@ module.exports = arr => async (req, res, next) => {
       }
     });
   } catch (error) {
-    console.log(error.message);
     next(createError(500, error.message));
   }
   next();

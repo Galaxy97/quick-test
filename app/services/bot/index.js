@@ -6,7 +6,7 @@ module.exports.launchTest = async msg => {
     await axios.post(`${config.telegram.BOT_URL}/quicktest/launchtest`, msg);
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
   return false;
 };
@@ -16,7 +16,7 @@ module.exports.sendQuestion = async msg => {
     await axios.post(`${config.telegram.BOT_URL}/quicktest/question`, msg);
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
   return false;
 };
@@ -29,7 +29,7 @@ module.exports.partWithoutAnswer = async msg => {
     );
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
   return false;
 };
@@ -42,7 +42,7 @@ module.exports.sendResOnQuestion = async msg => {
     );
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
   return false;
 };
@@ -51,7 +51,7 @@ module.exports.sendEndQuestion = async msg => {
     await axios.post(`${config.telegram.BOT_URL}/quicktest/question/end`, msg);
     return true;
   } catch (error) {
-    console.log(error);
+    console.error(error.message);
   }
   return false;
 };

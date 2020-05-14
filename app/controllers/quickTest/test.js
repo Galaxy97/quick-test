@@ -126,7 +126,7 @@ module.exports.setResult = async body => {
       await services.quickTest.saveInRedis(test.id, test);
     }
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
   }
 };
 
@@ -186,8 +186,6 @@ async function handleQuestion(actualRepeat, id) {
   const test = await services.quickTest.getFromRedis(id);
   // if end test
   if (actualRepeat === test.attempts) {
-    console.log('end test !!!!');
-    // end test
     const results = await services.quickTest.getResult(id);
     const statistics = services.quickTest.calculateStatistics(results, test);
     const lecturerSocketID = test.lecturerId + test.code;

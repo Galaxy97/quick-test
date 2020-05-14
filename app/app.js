@@ -10,7 +10,7 @@ const api = require('./routers/api');
 const app = express();
 
 app.use(helmet());
-app.use(morgan('dev'));
+app.use(morgan('tiny'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.text());
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 app.use((error, req, res, next) => {
   res.status(error.status || 500);
   const errMessage = {status: error.status, message: error.message};
-  if (config.server.NODE_ENV === 'delelopment') {
+  if (config.server.NODE_ENV === 'development') {
     errMessage.stack = error.stack;
     [errMessage.body] = error;
   }
