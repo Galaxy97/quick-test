@@ -3,7 +3,6 @@ const {promisify} = require('util');
 const {knex, redis} = require('../../db');
 
 const getAsync = promisify(redis.get).bind(redis);
-const config = require('../../config');
 
 const makeCode = () => {
   let result = '';
