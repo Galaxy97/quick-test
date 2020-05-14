@@ -203,7 +203,7 @@ async function handleQuestion(actualRepeat, id) {
     );
     await services.bot.sendEndQuestion({
       participants: test.participants,
-      statistics: statistics.individual,
+      statistics: statistics.individualArr,
     });
     await services.quickTest.deleteFromRedis(id);
     return false;
