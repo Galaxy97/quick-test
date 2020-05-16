@@ -14,7 +14,7 @@ module.exports = {
       min: 1,
       max: 2,
     },
-    debug: false,
+    debug: true,
     migrations: {
       tableName: 'knex_migrations',
       directory: './app/migrations',
@@ -33,7 +33,7 @@ module.exports = {
       min: 1,
       max: 2,
     },
-    debug: true,
+    debug: false,
     migrations: {
       tableName: 'knex_migrations',
       directory: './app/migrations',

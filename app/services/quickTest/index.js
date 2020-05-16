@@ -370,3 +370,12 @@ module.exports.calculateStatistics = (data, test) => {
     questionsArr: answers.questionsArr,
   };
 };
+
+module.exports.deleteTest = async id => {
+  // edit cours by id
+  const res = await knex('tests')
+    .where({id})
+    .del();
+  if (res) return true;
+  return false;
+};

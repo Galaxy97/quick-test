@@ -206,7 +206,8 @@ async function handleQuestion(actualRepeat, id) {
       statistics: statistics.individualArr,
     });
     await services.quickTest.deleteFromRedis(id);
-    return false;
+    await services.quickTest.deleteTest(id);
+    return false; // end this function
   }
   // delay from last question or from start event
   await delay(5000);
