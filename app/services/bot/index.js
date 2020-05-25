@@ -3,7 +3,11 @@ const config = require('../../config');
 
 module.exports.launchTest = async msg => {
   try {
-    await axios.post(`${config.telegram.BOT_URL}/quicktest/launchtest`, msg);
+    await axios.post(`${config.telegram.BOT_URL}/quicktest/launchtest`, msg, {
+      headers: {
+        'X-Auth-Token': config.telegram.BOT_TOKEN,
+      },
+    });
     return true;
   } catch (error) {
     console.error(error.message);
@@ -13,7 +17,11 @@ module.exports.launchTest = async msg => {
 
 module.exports.sendQuestion = async msg => {
   try {
-    await axios.post(`${config.telegram.BOT_URL}/quicktest/question`, msg);
+    await axios.post(`${config.telegram.BOT_URL}/quicktest/question`, msg, {
+      headers: {
+        'X-Auth-Token': config.telegram.BOT_TOKEN,
+      },
+    });
     return true;
   } catch (error) {
     console.error(error.message);
@@ -26,6 +34,11 @@ module.exports.partWithoutAnswer = async msg => {
     await axios.post(
       `${config.telegram.BOT_URL}/quicktest/question/noresult`,
       msg,
+      {
+        headers: {
+          'X-Auth-Token': config.telegram.BOT_TOKEN,
+        },
+      },
     );
     return true;
   } catch (error) {
@@ -39,6 +52,11 @@ module.exports.sendResOnQuestion = async msg => {
     await axios.post(
       `${config.telegram.BOT_URL}/quicktest/question/result`,
       msg,
+      {
+        headers: {
+          'X-Auth-Token': config.telegram.BOT_TOKEN,
+        },
+      },
     );
     return true;
   } catch (error) {
@@ -48,7 +66,11 @@ module.exports.sendResOnQuestion = async msg => {
 };
 module.exports.sendEndQuestion = async msg => {
   try {
-    await axios.post(`${config.telegram.BOT_URL}/quicktest/question/end`, msg);
+    await axios.post(`${config.telegram.BOT_URL}/quicktest/question/end`, msg, {
+      headers: {
+        'X-Auth-Token': config.telegram.BOT_TOKEN,
+      },
+    });
     return true;
   } catch (error) {
     console.error(error.message);
