@@ -10,6 +10,7 @@ module.exports.createTest = async (req, res, next) => {
       lecturerId: req.user.id,
       questionsId: req.body.questionsId,
       title: req.body.title,
+      funnyMessage: req.body.funnyMessage,
     });
     res.json({code});
   } catch (error) {

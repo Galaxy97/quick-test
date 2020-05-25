@@ -29,7 +29,6 @@ async function getResults(test) {
       services.quickTest.getMotivationPhrases(),
       services.quickTest.getCongtatulationPhrases(),
     ]);
-    console.log(motivationPhrases, congtatulationPhrases);
     results.forEach((val, index) => {
       if (val.answer === true)
         results[index].phrase =
