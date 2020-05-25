@@ -279,8 +279,7 @@ function sortAndCheckAnswers(data, test) {
   const questions = {};
   data.forEach(answer => {
     const isRight =
-      answer.participant_answer ===
-      questionsAns[answer.question_id].rightAnswId;
+      answer.participant_answer === questionsAns[answer.question_id].id;
     // true or false
     // write by users answers
     individuals[answer.telegram_id] = individuals[answer.telegram_id] || [];
