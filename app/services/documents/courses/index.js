@@ -15,8 +15,6 @@ module.exports.create = async (user, body) => {
       title: body.title,
       lecturer_id: user.id,
       description: body.description,
-      color_top: body.colorTop,
-      color_bottom: body.colorBottom,
     })
     .returning('id');
   if (course.length > 0) return course[0];
@@ -31,8 +29,6 @@ module.exports.editById = async (user, id, body) => {
       title: body.title,
       lecturer_id: user.id,
       description: body.description,
-      color_top: body.colorTop,
-      color_bottom: body.colorBottom,
     })
     .returning('id');
   if (course.length > 0) return course[0];

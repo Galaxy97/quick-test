@@ -15,7 +15,12 @@ const makeCode = () => {
   return result;
 };
 
-module.exports.create = async ({lecturerId, questionsId, title}) => {
+module.exports.create = async ({
+  lecturerId,
+  questionsId,
+  title,
+  funnyMessage,
+}) => {
   // create new cours
   // create unique code
   let check;
@@ -34,6 +39,7 @@ module.exports.create = async ({lecturerId, questionsId, title}) => {
       title,
       is_open: true,
       code,
+      funny_message: funnyMessage || false,
     })
     .returning('id');
   const tq = questionsId.map(id => {
@@ -194,7 +200,7 @@ module.exports.setResult = async ({
       test_id: testId,
       telegram_id: participantId,
       question_id: questionId,
-      participant_answers: JSON.stringify(answer),
+      participant_answer: answer,
     });
     return true;
   }
@@ -207,7 +213,7 @@ module.exports.getResult = async (testId, questionId) => {
   };
   if (questionId) sel.question_id = questionId;
   const records = await knex('test_results')
-    .select('telegram_id', 'participant_answers', 'question_id')
+    .select('telegram_id', 'participant_answer', 'question_id')
     .where(sel);
   return records;
 };
@@ -221,13 +227,13 @@ module.exports.lookingPartWithOutAnswer = async (
     .select('telegram_id')
     .where({test_id: testId, question_id: questionId});
   partWithAnswer = partWithAnswer.map(obj => obj.telegram_id);
-  const withOutAnswer = [];
+  const withoutAnswer = [];
   participants.forEach(id => {
     if (partWithAnswer.indexOf(id) === -1) {
-      withOutAnswer.push(id);
+      withoutAnswer.push(id);
     }
   });
-  return withOutAnswer;
+  return withoutAnswer;
 };
 
 module.exports.saveInRedis = async (id, data) => {
@@ -260,45 +266,22 @@ module.exports.deleteFromRedis = async id => {
   }
 };
 
-function isEqualArrays(a, b) {
-  // if length is not equal
-  if (a.length !== b.length) {
-    return false;
-  }
-  // comapring each element of array
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) return false;
-  }
-  return true;
-}
-
 function sortAndCheckAnswers(data, test) {
-  // write in questions write answers id in array,
-  // right answer can be more than one
   const questionsAns = {};
   test.questions.forEach(question => {
-    const rightAnswId = [];
-    question.answers.forEach(answ => {
-      if (answ.answer === true) {
-        rightAnswId.push(answ.id);
-      }
-    });
+    // id is rightAnswId
+    const {id} = question.answers.find(answ => answ.answer === true);
     questionsAns[question.id] = {
-      rightAnswId,
+      id,
     };
   });
   const individuals = {};
   const questions = {};
   data.forEach(answer => {
-    let isRight;
-    if (answer.participant_answers === false) isRight = false;
-    else {
-      isRight = isEqualArrays(
-        answer.participant_answers,
-        questionsAns[answer.question_id].rightAnswId,
-      ); // true or false
-    }
+    const isRight =
+      answer.participant_answer ===
+      questionsAns[answer.question_id].rightAnswId;
+    // true or false
     // write by users answers
     individuals[answer.telegram_id] = individuals[answer.telegram_id] || [];
     individuals[answer.telegram_id].push({
@@ -353,9 +336,9 @@ module.exports.calculateStatistics = (data, test) => {
   });
   let all = 0;
   let trueAnsw = 0;
-  Object.keys(answers.questions).forEach(questionId => {
-    all += answers.questions[questionId].all;
-    trueAnsw += answers.questions[questionId].true;
+  answers.questionsArr.forEach(quest => {
+    all += quest.all;
+    trueAnsw += quest.true;
   });
 
   return {
@@ -378,4 +361,14 @@ module.exports.deleteTest = async id => {
     .del();
   if (res) return true;
   return false;
+};
+
+module.exports.getMotivationPhrases = async () => {
+  const res = await knex('motivation_phrases').select('phrase');
+  return res;
+};
+
+module.exports.getCongtatulationPhrases = async () => {
+  const res = await knex('congtatulation_phrases').select('phrase');
+  return res;
 };

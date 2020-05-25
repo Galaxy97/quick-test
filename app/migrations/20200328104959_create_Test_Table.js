@@ -9,6 +9,7 @@ exports.up = async knex => {
     table.string('title').notNullable();
     table.string('code').notNullable();
     table.boolean('is_open').notNullable();
+    table.boolean('funny_message').defaultTo(false);
     table.unique('code');
     table.timestamp('created_at').defaultTo(knex.fn.now());
     table.timestamp('updated_at').defaultTo(knex.fn.now());

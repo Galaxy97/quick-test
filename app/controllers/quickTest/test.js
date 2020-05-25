@@ -6,25 +6,41 @@ const services = require('../../services');
 const Lecturer = require('../../ws/lecturers');
 const delay = require('../../utils/delay');
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
 async function getResults(test) {
   let results = await services.quickTest.getResult(
     test.id,
     test.questions[test.actual].id,
   );
   results = results.map(res => {
-    const answArr = [];
-    test.questions[test.actual].answers.forEach(answQuestion => {
-      res.participant_answers.forEach(answ => {
-        if (answ === answQuestion.id) {
-          answArr.push(answQuestion.answer);
-        }
-      });
-    });
+    const {answer} = test.questions[test.actual].answers.find(
+      answQuestion => res.participant_answer === answQuestion.id,
+    );
     return {
       participants: res.telegram_id,
-      answers: answArr,
+      answer,
     };
   });
+  if (test.funnyMessage) {
+    const [motivationPhrases, congtatulationPhrases] = await Promise.all([
+      services.quickTest.getMotivationPhrases(),
+      services.quickTest.getCongtatulationPhrases(),
+    ]);
+    console.log(motivationPhrases, congtatulationPhrases);
+    results.forEach((val, index) => {
+      if (val.answer === true)
+        results[index].phrase =
+          congtatulationPhrases[
+            getRandomInt(congtatulationPhrases.length)
+          ].phrase;
+      else
+        results[index].phrase =
+          motivationPhrases[getRandomInt(motivationPhrases.length)].phrase;
+    });
+  }
   return results;
 }
 
@@ -58,7 +74,7 @@ async function timeoutFunc(test) {
         testId: test.id,
         participantId,
         questionId: test.questions[test.actual].id,
-        answer: false,
+        answer: 0,
       }),
     );
   });
@@ -74,7 +90,6 @@ async function timeoutFunc(test) {
 async function endRound(test) {
   // end question round
   const results = await getResults(test);
-  // await services.bot.sendResOnQuestion({
   services.bot.sendResOnQuestion({
     title: test.questions[test.actual].title,
     results,
@@ -280,12 +295,18 @@ module.exports.addStudent = async body => {
   };
 };
 
-module.exports.create = async ({lecturerId, questionsId, title}) => {
+module.exports.create = async ({
+  lecturerId,
+  questionsId,
+  title,
+  funnyMessage,
+}) => {
   // create code
   const test = await services.quickTest.create({
     lecturerId,
     questionsId,
     title,
+    funnyMessage,
   });
 
   test.attempts = questionsId.length;
@@ -293,6 +314,7 @@ module.exports.create = async ({lecturerId, questionsId, title}) => {
   test.title = title;
   test.lecturerId = lecturerId;
   test.active = true;
+  test.funnyMessage = funnyMessage || false;
   const questionsFunc = [];
 
   questionsId.forEach(id => {

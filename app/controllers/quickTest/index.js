@@ -35,7 +35,7 @@ module.exports.newLecturerConnection = async (socket, headers, wss) => {
     const socketId = lecturer.id + headers.code;
     // delete old clients with this id
     wss.clients.forEach(client => {
-      if (client.id === socketId) {
+      if (client.id && client.id === socketId) {
         client.terminate(); // close connection
       }
     });
