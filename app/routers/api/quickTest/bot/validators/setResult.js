@@ -7,7 +7,7 @@ const schema = ajv.compile({
     test_id: {type: 'number'},
     participant_id: {type: 'number'},
     question_id: {type: 'number'},
-    answer: {type: 'array'},
+    answer: {type: 'number'},
   },
 });
 

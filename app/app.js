@@ -4,6 +4,8 @@ const createError = require('http-errors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
+require('express-async-errors');
+
 const config = require('./config');
 const api = require('./routers/api');
 

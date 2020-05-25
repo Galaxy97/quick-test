@@ -16,7 +16,7 @@ exports.up = async knex => {
       .references('questions.id')
       .onUpdate('CASCADE')
       .onDelete('CASCADE');
-    table.json('participant_answers').notNullable();
+    table.integer('participant_answer').notNullable();
   });
 };
 

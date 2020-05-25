@@ -3,8 +3,6 @@ exports.up = async knex => {
     table.increments('id');
     table.string('title').notNullable();
     table.string('description').notNullable();
-    table.float('color_top').notNullable();
-    table.float('color_bottom').notNullable();
     table
       .integer('lecturer_id')
       .references('lecturers.id')

@@ -14,6 +14,9 @@ const schema = ajv.compile({
     title: {
       type: 'string',
     },
+    funnyMessage: {
+      type: 'boolean',
+    },
   },
 });
 
