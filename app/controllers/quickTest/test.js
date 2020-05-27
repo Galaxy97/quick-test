@@ -2,6 +2,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-plusplus */
 
+const createError = require('http-errors');
 const services = require('../../services');
 const Lecturer = require('../../ws/lecturers');
 const delay = require('../../utils/delay');
@@ -236,7 +237,7 @@ module.exports.launchTest = async code => {
   // check code
   const testDB = await services.quickTest.getTestByCode(code);
   if (!testDB || !testDB.id) {
-    throw new Error('this test is not exsist');
+    throw new Error(400, 'this test is not exsist');
   }
   const test = await services.quickTest.getFromRedis(testDB.id);
   // gett all participant from test
@@ -258,7 +259,7 @@ module.exports.addStudent = async body => {
   // check code
   const testDB = await services.quickTest.getTestByCode(body.code);
   if (!testDB || !testDB.id) {
-    throw new Error('this test is not exsist');
+    throw createError(400, 'this test is not exsist');
   }
   const test = await services.quickTest.getFromRedis(testDB.id);
   // find or write data this student

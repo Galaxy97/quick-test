@@ -24,7 +24,7 @@ module.exports.addStudent = async (req, res, next) => {
     const message = await Test.addStudent(req.body);
     res.json(message);
   } catch (error) {
-    next(createError(500, error.message));
+    next(createError(error.status || 500, error.message));
   }
 };
 
