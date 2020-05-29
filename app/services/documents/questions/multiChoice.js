@@ -15,7 +15,7 @@ module.exports.create = async (topicId, body) => {
     .insert({
       topic_id: topicId,
     })
-    .returning('id');
+    .returning('question_id');
   await knex('multi_choice').insert({
     question_id: questionId,
     title: body.title,
@@ -29,14 +29,14 @@ module.exports.create = async (topicId, body) => {
 module.exports.editById = async (topicId, id, body) => {
   // edit topic by id
   const question = await knex('multi_choice')
-    .where({id, topic_id: topicId})
+    .where({question_id: id, topic_id: topicId})
     .update({
       title: body.title,
       subtitle: body.subtitle,
       answers: JSON.stringify(body.answers),
       topic_id: topicId,
     })
-    .returning('id');
+    .returning('question_id');
   if (question.length > 0) return question[0];
   return false;
 };
@@ -44,7 +44,7 @@ module.exports.editById = async (topicId, id, body) => {
 module.exports.deleteById = async (topicId, id) => {
   // delete subject by id
   const res = await knex('multi_choice')
-    .where({id, topic_id: topicId})
+    .where({question_id: id, topic_id: topicId})
     .del();
   if (res) return true;
   return false;
