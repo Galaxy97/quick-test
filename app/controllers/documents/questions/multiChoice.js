@@ -28,7 +28,6 @@ module.exports.create = async (req, res, next) => {
 module.exports.editById = async (req, res, next) => {
   try {
     const question = await services.documents.questions.multiChoice.editById(
-      Number(req.query.topicId),
       Number(req.query.questionId),
       req.body,
     );

@@ -26,15 +26,14 @@ module.exports.create = async (topicId, body) => {
   return false;
 };
 
-module.exports.editById = async (topicId, id, body) => {
+module.exports.editById = async (id, body) => {
   // edit topic by id
   const question = await knex('multi_choice')
-    .where({question_id: id, topic_id: topicId})
+    .where({question_id: id})
     .update({
       title: body.title,
       subtitle: body.subtitle,
       answers: JSON.stringify(body.answers),
-      topic_id: topicId,
     })
     .returning('question_id');
   if (question.length > 0) return question[0];
