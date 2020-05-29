@@ -1,6 +1,6 @@
 module.exports = [
   {
     dbName: 'multi_choice',
-    props: [{tabProp: 'id', reqProp: 'questionId'}],
+    props: [{tabProp: 'question_id', reqProp: 'questionId'}],
   },
 ];
