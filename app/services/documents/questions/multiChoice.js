@@ -43,8 +43,8 @@ module.exports.editById = async (topicId, id, body) => {
 
 module.exports.deleteById = async (topicId, id) => {
   // delete subject by id
-  const res = await knex('multi_choice')
-    .where({question_id: id, topic_id: topicId})
+  const res = await knex('questions')
+    .where({id, topic_id: topicId})
     .del();
   if (res) return true;
   return false;
