@@ -135,6 +135,7 @@ module.exports.setResult = async body => {
         questionId: body.question_id,
         answerTitle: answer.title,
         answer: answer.answer,
+        actualQuestion: test.actual,
       }),
     );
 
