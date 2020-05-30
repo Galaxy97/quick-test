@@ -119,11 +119,8 @@ module.exports.setResult = async body => {
       return false; // if don't save
     }
     const lecturerSocketID = test.lecturerId + test.code;
-    const {answer} = test.questions[test.actual].answers.find(
+    const answer = test.questions[test.actual].answers.find(
       answQuestion => body.answer === answQuestion.id,
-    );
-    const question = test.questions.find(
-      quest => quest.question_id === Number(body.question_id),
     );
     const [participant] = await services.quickTest.getParticipantsNames([
       body.participant_id,
@@ -136,8 +133,8 @@ module.exports.setResult = async body => {
         participantId: body.participant_id,
         participantName: `${participant.first_name} ${participant.last_name}`,
         questionId: body.question_id,
-        questionTitle: question.title,
-        answer,
+        answerTitle: answer.title,
+        answer: answer.answer,
       }),
     );
 
