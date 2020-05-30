@@ -119,14 +119,25 @@ module.exports.setResult = async body => {
       return false; // if don't save
     }
     const lecturerSocketID = test.lecturerId + test.code;
+    const {answer} = test.questions[test.actual].answers.find(
+      answQuestion => body.answer === answQuestion.id,
+    );
+    const question = test.questions.find(
+      quest => quest.question_id === Number(body.question_id),
+    );
+    const [participant] = await services.quickTest.getParticipantsNames([
+      body.participant_id,
+    ]);
     Lecturer.sendLecturerMesseage(
       lecturerSocketID,
       JSON.stringify({
         path: 'particapant_answer',
         testId: body.test_id,
         participantId: body.participant_id,
+        participantName: `${participant.first_name} ${participant.last_name}`,
         questionId: body.question_id,
-        answer: body.answer,
+        questionTitle: question.title,
+        answer,
       }),
     );
 
@@ -195,6 +206,16 @@ async function prepareQuestion(actualRepeat, test) {
   });
 }
 
+function exchangeIdToName(arr, names) {
+  return arr.map(participant => {
+    const name = names.find(
+      nameU => nameU.telegram_id === Number(participant.participantId),
+    );
+    participant.name = `${name.first_name} ${name.last_name}`;
+    return participant;
+  });
+}
+
 // eslint-disable-next-line consistent-return
 async function handleQuestion(actualRepeat, id) {
   // get test info from redis
@@ -204,6 +225,9 @@ async function handleQuestion(actualRepeat, id) {
     const results = await services.quickTest.getResult(id);
     const statistics = services.quickTest.calculateStatistics(results, test);
     const lecturerSocketID = test.lecturerId + test.code;
+    const participantsNames = await services.quickTest.getParticipantsNames(
+      test.participants,
+    );
     Lecturer.sendLecturerMesseage(
       lecturerSocketID,
       JSON.stringify({
@@ -211,7 +235,10 @@ async function handleQuestion(actualRepeat, id) {
         testId: id,
         statistics: {
           common: statistics.common,
-          individual: statistics.individualArr,
+          individual: exchangeIdToName(
+            statistics.individualArr,
+            participantsNames,
+          ),
           questions: statistics.questionsArr,
         },
       }),

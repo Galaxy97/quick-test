@@ -325,7 +325,11 @@ module.exports.calculateStatistics = (data, test) => {
     answers.questions[questionId].forEach(user => {
       if (user.answer) trueAnsw++;
     });
+    const question = test.questions.find(
+      quest => quest.question_id === Number(questionId),
+    );
     answers.questionsArr.push({
+      questionTitle: question.title,
       questionId,
       all: test.participants.length,
       true: trueAnsw,
@@ -370,4 +374,11 @@ module.exports.getMotivationPhrases = async () => {
 module.exports.getCongtatulationPhrases = async () => {
   const res = await knex('congtatulation_phrases').select('phrase');
   return res;
+};
+
+module.exports.getParticipantsNames = async participants => {
+  const result = await knex('participants')
+    .select('telegram_id', 'first_name', 'last_name')
+    .whereIn('telegram_id', participants);
+  return result;
 };
