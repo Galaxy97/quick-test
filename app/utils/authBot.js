@@ -15,7 +15,7 @@ bot.start(async ctx => {
       } else ctx.reply(`this uuid is not exsist`);
     } else ctx.reply(`You have not token, please try again`);
   } catch (error) {
-    ctx.reply(`happend somth bad`);
+    ctx.reply(`happen something bad`);
   }
 });
 
