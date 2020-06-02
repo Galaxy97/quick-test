@@ -15,7 +15,7 @@ module.exports.create = async (topicId, body) => {
     .insert({
       topic_id: topicId,
     })
-    .returning('question_id');
+    .returning('id');
   await knex('multi_choice').insert({
     question_id: questionId,
     title: body.title,
