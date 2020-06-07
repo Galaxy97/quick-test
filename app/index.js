@@ -8,7 +8,7 @@ const server = http.createServer(app);
 const lecturers = require('./ws/lecturers');
 const config = require('./config');
 const {knex, redis} = require('./db');
-const authBot = require('./utils/authBot');
+const authBot = require('./authBot');
 
 server.on('upgrade', (request, socket, head) => {
   const {pathname} = url.parse(request.url);
