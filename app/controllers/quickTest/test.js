@@ -6,6 +6,7 @@ const createError = require('http-errors');
 const services = require('../../services');
 const Lecturer = require('../../ws/lecturers');
 const delay = require('../../utils/delay');
+const logger = require('../../utils/logger');
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
@@ -150,7 +151,7 @@ module.exports.setResult = async body => {
       await services.quickTest.saveInRedis(test.id, test);
     }
   } catch (error) {
-    console.error(error.message);
+    logger.error('set result error', error);
   }
 };
 

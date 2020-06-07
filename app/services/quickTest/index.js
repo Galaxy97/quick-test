@@ -1,6 +1,7 @@
 /* eslint-disable no-plusplus */
 const {promisify} = require('util');
 const {knex, redis} = require('../../db');
+const logger = require('../../utils/logger');
 
 const getAsync = promisify(redis.get).bind(redis);
 
@@ -98,7 +99,7 @@ module.exports.checkStudent = async student => {
       });
     }
   } catch (error) {
-    console.error(error.message);
+    logger.error('error check student', error);
   }
 };
 
@@ -157,7 +158,7 @@ module.exports.getParticipants = async testId => {
     });
     return participantsID;
   } catch (error) {
-    console.error(error.message);
+    logger.error('error get partcipants', error);
   }
 };
 
@@ -168,7 +169,7 @@ module.exports.closeTest = async testId => {
       .update({is_open: false})
       .where({id: testId});
   } catch (error) {
-    console.error(error.message);
+    logger.error('error close test', error);
   }
 };
 
@@ -180,7 +181,7 @@ module.exports.getQuestionsId = async testId => {
       .where({test_id: testId});
     return ids;
   } catch (error) {
-    console.error(error.message);
+    logger.error('error get question id', error);
   }
 };
 
@@ -240,7 +241,7 @@ module.exports.saveInRedis = async (id, data) => {
   try {
     await redis.set(id, JSON.stringify(data));
   } catch (error) {
-    console.error(error.message);
+    logger.error('error with save in redis', error);
     return false;
   }
   return true;
@@ -252,7 +253,7 @@ module.exports.getFromRedis = async id => {
     data = JSON.parse(data);
     return data;
   } catch (error) {
-    console.error(error.message);
+    logger.error('error with read from redis', error);
     return false;
   }
 };
@@ -261,7 +262,7 @@ module.exports.deleteFromRedis = async id => {
     await redis.del(id);
     return true;
   } catch (error) {
-    console.error(error.message);
+    logger.error('error with delete from redis', error);
     return false;
   }
 };

@@ -1,6 +1,7 @@
 const url = require('url');
 const http = require('http');
 const app = require('./app');
+const logger = require('./utils/logger');
 
 const server = http.createServer(app);
 // lecturers - instance ws server
@@ -22,7 +23,7 @@ server.on('upgrade', (request, socket, head) => {
 });
 
 redis.on('error', err => {
-  console.log(err.message);
+  logger.error(err.message);
   process.exit(1);
 });
 // check db connection
@@ -32,12 +33,12 @@ knex
     authBot.launch();
     server.listen(config.server.PORT, () => {
       lecturers.handle();
-      console.log(
+      logger.info(
         `Server running at ${config.server.HOST} port ${config.server.PORT}`,
       );
     });
   })
   .catch(err => {
-    console.log(err.message);
+    logger.error('system error', err);
     process.exit(1);
   });

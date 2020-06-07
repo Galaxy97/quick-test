@@ -1,5 +1,6 @@
 const axios = require('axios');
 const config = require('../../config');
+const logger = require('../../utils/logger');
 
 module.exports.launchTest = async msg => {
   try {
@@ -10,7 +11,7 @@ module.exports.launchTest = async msg => {
     });
     return true;
   } catch (error) {
-    console.error(error.message);
+    logger.error('error with launch test message to bot', error);
   }
   return false;
 };
@@ -24,7 +25,7 @@ module.exports.sendQuestion = async msg => {
     });
     return true;
   } catch (error) {
-    console.error(error.message);
+    logger.error('error with send question to bot', error);
   }
   return false;
 };
@@ -42,7 +43,7 @@ module.exports.partWithoutAnswer = async msg => {
     );
     return true;
   } catch (error) {
-    console.error(error.message);
+    logger.error('error with send message part without answer to bot', error);
   }
   return false;
 };
@@ -60,7 +61,7 @@ module.exports.sendResOnQuestion = async msg => {
     );
     return true;
   } catch (error) {
-    console.error(error.message);
+    logger.error('error with send result on question to bot', error);
   }
   return false;
 };
@@ -73,7 +74,7 @@ module.exports.sendEndQuestion = async msg => {
     });
     return true;
   } catch (error) {
-    console.error(error.message);
+    logger.error('error with send end question to bot', error);
   }
   return false;
 };

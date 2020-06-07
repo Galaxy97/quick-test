@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const createError = require('http-errors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const logger = require('./utils/logger');
 
 require('express-async-errors');
 
@@ -34,11 +35,6 @@ app.use((error, req, res, next) => {
   res.json({errMessage});
 });
 
-console.log(`
-***********************************************
-******* Application is ready for usage ********
-***********************************************
-***********************************************
-`);
+logger.info('Application is ready for usage');
 
 module.exports = app;

@@ -3,6 +3,7 @@
 const createError = require('http-errors');
 const services = require('../../services');
 const Test = require('./test');
+const logger = require('../../utils/logger');
 
 module.exports.createTest = async (req, res, next) => {
   try {
@@ -45,7 +46,7 @@ module.exports.newLecturerConnection = async (socket, headers, wss) => {
     // assign socketid to socket
     socket.id = socketId;
   } catch (error) {
-    console.error(error.message);
+    logger.error('new lecturer error with ws connection', error);
   }
 };
 
@@ -53,7 +54,7 @@ module.exports.launchTest = code => {
   try {
     Test.launchTest(code);
   } catch (error) {
-    console.error(error.message);
+    logger.error('launch test error', error);
   }
 };
 
@@ -62,6 +63,7 @@ module.exports.setResult = async (req, res, next) => {
     await Test.setResult(req.body);
     res.json({message: 'successful saved'});
   } catch (error) {
+    logger.error('set result error', error);
     next(createError(500, error.message));
   }
 };
